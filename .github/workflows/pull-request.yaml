@@ -60,9 +60,13 @@ jobs:
       - name: Preset up execution environment
         run: |
           git submodule update --init --recursive
+      - name: Copy Lean4Repl
+        run: |
           cp -r Lean4Repl/ execution_env/
+      - name: Build Lean4Repl
+        run: |
           cd execution_env
-            lake exec cache get
-            lake build Lean4Repl
+          lake exec cache get
+          lake build Lean4Repl
       - name: Unit Tests
         run: python -m pytest tests/e2e
