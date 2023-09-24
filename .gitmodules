@@ -1,0 +1,3 @@
+[submodule "Lean4Repl"]
+	path = Lean4Repl
+	url = https://github.com/josojo/Lean4Repl.git
