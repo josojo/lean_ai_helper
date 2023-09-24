@@ -71,5 +71,5 @@ jobs:
         run: |
           cd execution_env
           lake exe cache get
-      - name: Unit Tests
+      - name: e2e Tests
         run: python -m pytest tests/e2e
