@@ -67,5 +67,9 @@ jobs:
         run: |
           cd execution_env
           lake build Lean4Repl
+      - name: Get mathlib dep
+        run: |
+          lake --version
+          lake exec cache get
       - name: Unit Tests
         run: python -m pytest tests/e2e
