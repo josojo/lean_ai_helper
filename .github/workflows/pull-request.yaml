@@ -69,6 +69,7 @@ jobs:
           lake build Lean4Repl
       - name: Get mathlib dep
         run: |
+          cd execution_env
           lake --version
           lake exec cache get
       - name: Unit Tests
