@@ -18,3 +18,7 @@ source venv/bin/activate
 make test-unit
 make test-e2e
 ```
+
+## Acknowledgement
+
+Much of the code is copied and inspired by [Lean Dojo](https://github.com/lean-dojo/LeanDojo). It was mostly reorganized to serve a bigger audience and be faster to execute.
