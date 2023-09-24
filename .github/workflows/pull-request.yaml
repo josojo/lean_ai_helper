@@ -70,7 +70,6 @@ jobs:
       - name: Get mathlib dep
         run: |
           cd execution_env
-          lake --version
-          lake exec cache get
+          lake exe cache get
       - name: Unit Tests
         run: python -m pytest tests/e2e
