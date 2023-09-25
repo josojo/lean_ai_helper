@@ -3,7 +3,6 @@
 import os
 import json
 import shlex
-import shutil
 import subprocess
 import re
 from dataclasses import dataclass, field
@@ -11,6 +10,7 @@ from pathlib import Path
 from typing import Union, List, Optional, Tuple, Dict
 from loguru import logger
 
+from src.lean_env.execution_env import ExecutionEnv
 from src.interaction.goals import Goal, parse_goals
 from src.mwe import Mwe
 from src.interaction.utils import format_tatic_for_repl
@@ -91,19 +91,16 @@ class Gym:
         """Initialize Gym."""
         self.mwe = mwe
         self.proc: Optional[subprocess.Popen[str]] = None
-        if tmp_dir is None:
-            self.tmp_dir = Path().cwd() / "execution_env"
-            logger.debug(f"Using default tmp_dir: {self.tmp_dir}")
-        else:
-            self.tmp_dir = tmp_dir
+        self.execution_env = ExecutionEnv(tmp_dir)
         self.is_crashed = False
 
     def __enter__(self) -> Tuple["Gym", TacticState]:
         """Initialize Dojo."""
         logger.debug(f"Initializing Gym for {self.mwe.name}")
         try:
-            self._create_test_env()
-            os.chdir(self.tmp_dir)
+            self.execution_env.create_env()
+            self.execution_env.write_main_file(self._modify_proof())
+            os.chdir(self.execution_env.tmp_dir)
 
             # Build the common repl tactic in a separate git repo and
             # copy the bin files into the traced repo
@@ -184,31 +181,6 @@ class Gym:
         if match is not None:
             return tactic_state[match.end() :]
         return tactic_state
-
-    def _create_test_env(self) -> None:
-        """Create a test environment for the proof."""
-
-        # copy the content from common repl dir into the tmp dir
-
-        if not os.path.exists(self.tmp_dir):
-            logger.debug("Copying the content from submodule repl dir into the tmp dir")
-            shutil.copytree(
-                str(Path.cwd() / "Lean4Repl"),
-                str(self.tmp_dir) + "/",
-                dirs_exist_ok=True,
-            )
-            os.chdir(self.tmp_dir)
-            command = "lake exe cache get"
-            subprocess.run(command.split(), check=True)
-            command = "lake build Lean4Repl"
-            subprocess.run(command.split(), check=True)
-
-        # Interaction through tactics.
-        modified_code = self._modify_proof()
-        repl_file = "Main.lean"
-        repl_dst = self.tmp_dir / repl_file
-        with repl_dst.open("wt") as oup:
-            oup.write(modified_code)
 
     def _modify_proof(self) -> str:
         # Modify the proof and set up the `repl` tactic.
