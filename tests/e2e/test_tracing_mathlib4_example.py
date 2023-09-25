@@ -10,7 +10,9 @@ def test_example_1() -> None:
     """Test the example from https://leanprover-community.github.io/mwe.html."""
 
     code = ""
-    with open("tests/data/Mathlib.Meta.NormNum.Prime.lean", "r", encoding="utf-8") as file:
+    with open(
+        "tests/data/Mathlib.Meta.NormNum.Prime.lean", "r", encoding="utf-8"
+    ) as file:
         code = file.read()
 
     logger.debug("code len: " + str(len(code)))
