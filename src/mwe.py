@@ -26,10 +26,6 @@ def parse_code(code: str, name: str) -> List[int]:
         if not line.startswith(" "):
             proof_end = proof_start + i
             break
-    logger.debug(f"code: {code}")
-    logger.debug(f"theorem_start: {theorem_start}")
-    logger.debug(f"proof_start: {proof_start}")
-    logger.debug(f"proof_end: {proof_end}")
     return [theorem_start, proof_start, proof_end]
 
 
