@@ -9,9 +9,7 @@ from loguru import logger
 class ExecutionEnv:
     def __init__(self, tmp_dir: Optional[Path] = None) -> None:
         if tmp_dir is None:
-            self.tmp_dir = (
-                Path(__file__).parent.parent.parent.absolute() / "execution_env"
-            )
+            self.tmp_dir = Path(__file__).parent.parent.absolute() / "execution_env"
             logger.debug(f"Using default tmp_dir: {self.tmp_dir}")
         else:
             self.tmp_dir = tmp_dir
