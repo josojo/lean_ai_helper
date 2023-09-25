@@ -9,7 +9,9 @@ from loguru import logger
 class ExecutionEnv:
     def __init__(self, tmp_dir: Optional[Path] = None) -> None:
         if tmp_dir is None:
-            self.tmp_dir = Path().cwd() / "execution_env"
+            self.tmp_dir = (
+                Path(__file__).parent.parent.parent.absolute() / "execution_env"
+            )
             logger.debug(f"Using default tmp_dir: {self.tmp_dir}")
         else:
             self.tmp_dir = tmp_dir
@@ -21,7 +23,7 @@ class ExecutionEnv:
         if not os.path.exists(self.tmp_dir):
             logger.debug("Copying the content from submodule repl dir into the tmp dir")
             shutil.copytree(
-                str(Path.cwd() / "Lean4Repl"),
+                str(Path(__file__).parent.parent.parent.absolute() / "Lean4Repl"),
                 str(self.tmp_dir) + "/",
                 dirs_exist_ok=True,
             )

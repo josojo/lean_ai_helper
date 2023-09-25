@@ -1,5 +1,5 @@
 import pytest
-
+import os
 from src.interaction.gym import Gym, ProofFinished
 from src.mwe import Mwe
 
