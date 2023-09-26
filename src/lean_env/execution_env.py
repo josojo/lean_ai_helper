@@ -39,6 +39,5 @@ class ExecutionEnv:
         # Interaction through tactics.
         repl_file = "Main.lean"
         repl_dst = self.tmp_dir / repl_file
-        logger.debug(f"Writing the code to {repl_dst}")
         with repl_dst.open("wt") as oup:
             oup.write(code)
