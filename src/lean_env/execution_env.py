@@ -9,7 +9,9 @@ from loguru import logger
 class ExecutionEnv:
     def __init__(self, tmp_dir: Optional[Path] = None) -> None:
         if tmp_dir is None:
-            self.tmp_dir = Path(__file__).parent.parent.absolute() / "execution_env"
+            self.tmp_dir = (
+                Path(__file__).parent.parent.parent.absolute() / "execution_env"
+            )
             logger.debug(f"Using default tmp_dir: {self.tmp_dir}")
         else:
             self.tmp_dir = tmp_dir
@@ -37,5 +39,6 @@ class ExecutionEnv:
         # Interaction through tactics.
         repl_file = "Main.lean"
         repl_dst = self.tmp_dir / repl_file
+        logger.debug(f"Writing the code to {repl_dst}")
         with repl_dst.open("wt") as oup:
             oup.write(code)

@@ -1,3 +1,4 @@
+import re
 from typing import List
 from loguru import logger
 
@@ -14,7 +15,12 @@ def parse_code(code: str, name: str) -> List[int]:
         list: A list containing the start position of the theorem,
         the start position of the proof, and the end position of the proof.
     """
-    theorem_start = code.find(f"theorem {name}")
+
+    theorem_pattern = re.compile(r"\n.*theorem " + re.escape(name))
+    match = theorem_pattern.search(code)
+    if match is None:
+        raise ValueError(f"Theorem {name} not found in code.")
+    theorem_start = match.start()
     proof_start = code.find(":=", theorem_start) + 2
     lines = code[proof_start:].split("\n")
     logger.debug(f"lines: {lines[1:]}")
