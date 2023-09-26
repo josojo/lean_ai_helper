@@ -11,6 +11,44 @@ from src.lean_env.execution_env import ExecutionEnv
 from src.mwe import Mwe
 
 
+class PosEncoding:
+    line: int
+    column: int
+
+    def __init__(
+        self,
+        line: int,
+        column: int,
+    ):
+        self.line = line
+        self.column = column
+
+
+class Premise:
+    pos: PosEncoding
+    mod_name: str
+    full_name: str
+    end_pos: PosEncoding
+    def_pos: PosEncoding
+    def_end_pos: PosEncoding
+
+    def __init__(
+        self,
+        pos: PosEncoding,
+        mod_name: str,
+        full_name: str,
+        end_pos: PosEncoding,
+        def_pos: PosEncoding,
+        def_end_pos: PosEncoding,
+    ):
+        self.pos = pos
+        self.mod_name = mod_name
+        self.full_name = full_name
+        self.end_pos = end_pos
+        self.def_pos = def_pos
+        self.def_end_pos = def_end_pos
+
+
 class TacticState:
     state_before: str
     state_after: str
@@ -32,6 +70,7 @@ class TacticState:
 
 class AstContent:
     tatics: List[TacticState]
+    premises: List[Premise]
 
     def __init__(
         self,
@@ -40,7 +79,7 @@ class AstContent:
         command_as_ts: List[Any],
     ):
         self.tatics = list(map(lambda tac: TacticState(**tac), tactics))
-        self.premises = premises
+        self.premises = list(map(lambda pre: Premise(**pre), premises))
         self.command_as_ts = command_as_ts
 
 
