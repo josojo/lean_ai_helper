@@ -50,13 +50,6 @@ jobs:
           curl -sSfL https://github.com/leanprover/elan/releases/download/v3.0.0/elan-x86_64-unknown-linux-gnu.tar.gz | tar xz
           ./elan-init -y --default-toolchain none
           echo "$HOME/.elan/bin" >> $GITHUB_PATH
-      - name: Cache execution enviroment
-        uses: actions/cache@v2
-        with:
-          path: execution_env
-          key: ${{ runner.os }}-execution_env-${{ hashFiles('**/lake-toolchain') }}-${{ hashFiles('**/lakefile.lean') }}
-          restore-keys: |
-            ${{ runner.os }}-execution_env
       - name: Preset up execution environment
         run: |
           git submodule update --init --recursive
