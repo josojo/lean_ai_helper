@@ -3,6 +3,7 @@ import unittest
 from src.interaction.utils import (
     undo_line_splits_for_dot_notation,
     undo_line_splits_for_unclosed_parenthesis,
+    format_tatic_for_repl,
 )
 
 
@@ -60,6 +61,21 @@ class TestUndoLineSplits(unittest.TestCase):
             "· exact h",
         ]
         self.assertEqual(undo_line_splits_for_dot_notation(commands), expected)
+
+    def test_format_tatic_for_repl(self):
+        test_str = " by\n rw [\u2190 Finset.coe_ssubset, Finite.coe_toFins]"
+        self.assertEqual(
+            format_tatic_for_repl(test_str),
+            ["rw [\u2190 Finset.coe_ssubset, Finite.coe_toFins]"],
+        )
+
+    def test_format_tatic_for_repl_2(self):
+        # happend with apply Submodule.map_comap_le
+        test_str = " by\n rw [\u2190 Finset.coe_ssubset, Finite.coe_toFins]; simp\n"
+        self.assertEqual(
+            format_tatic_for_repl(test_str),
+            ["rw [\u2190 Finset.coe_ssubset, Finite.coe_toFins]", " simp"],
+        )
 
 
 if __name__ == "__main__":

@@ -1,12 +1,22 @@
 from typing import List
-from loguru import logger
 
 
 def format_tatic_for_repl(proof: str) -> List[str]:
-    proof = proof.replace(";", "\n")
-    if proof.startswith("exact ("):
+    if proof.startswith(" by\n"):
+        proof = proof[5:]
+    elif proof.startswith(" by"):
+        proof = proof[3:]
+    elif proof.startswith("by\n"):
+        proof = proof[4:]
+    elif proof.startswith("by"):
+        proof = proof[2:]
+    else:
+        proof = "exact (" + proof + ")"
         return [proof]
-    proof_array = undo_line_splits_for_unclosed_parenthesis(proof.split("\n"))
+    proof = proof.replace(";", "\n")
+    proof_array = proof.split("\n")
+    proof_array = [line for line in proof_array if line.strip() != ""]
+    proof_array = undo_line_splits_for_unclosed_parenthesis(proof_array)
     proof_array = undo_line_splits_for_dot_notation(proof_array)
     return proof_array
 
@@ -16,9 +26,8 @@ def undo_line_splits_for_dot_notation(commands: List[str]) -> List[str]:
     # iterate over the index of the commands
     i = 0
     while i <= len(commands) - 2:
-        logger.debug(f"Checking dot notation line {i}: {commands[i]}")
         # check if the leading character after spaces is a dot
-        if commands[i].strip()[0] == "\u00b7":
+        if commands[i].strip().startswith("\u00b7"):
             # count the leading spaces
             num_spaces = len(commands[i]) - len(commands[i].lstrip())
             # check if the next line has more leading spaces
@@ -38,8 +47,8 @@ def undo_line_splits_for_unclosed_parenthesis(commands: List[str]) -> List[str]:
     opening_parenthesis = ["(", "{", "[", "\u27e8"]
     closing_parenthesis = [")", "}", "]", "\u27e9"]
     # iterate over the index of the commands
-    for i in range(len(commands) - 1):
-        logger.debug(f"Checking line {i}: {commands[i]}")
+    i = 0
+    while i <= len(commands) - 2:
         for opening, closing in zip(opening_parenthesis, closing_parenthesis):
             # count the number of opening and closing parenthesis
             num_opening = commands[i].count(opening)
@@ -50,5 +59,5 @@ def undo_line_splits_for_unclosed_parenthesis(commands: List[str]) -> List[str]:
                 commands[i] = commands[i] + commands[i + 1]
                 commands.pop(i + 1)
                 i -= 1
-
+        i += 1
     return commands

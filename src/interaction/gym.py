@@ -150,7 +150,19 @@ class Gym:
         tsid = state.identity
 
         tactic_array = format_tatic_for_repl(tactic)
-        req = json.dumps({"sid": tsid, "cmd": tactic_array})
+        return self._submit_tactics(tsid, tactic_array)
+
+    def run_tacs(self, state: TacticState, tactics: List[str]) -> TacticResult:
+        if not isinstance(state, TacticState):
+            raise RuntimeError(
+                f"Attempting to run a tactic on an invalid state {state}."
+            )
+
+        tsid = state.identity
+        return self._submit_tactics(tsid, tactics)
+
+    def _submit_tactics(self, tsid: int, tactics: List[str]) -> TacticResult:
+        req = json.dumps({"sid": tsid, "cmd": tactics})
         res = self._submit_request(req)
 
         if res["error"] is not None:
@@ -215,7 +227,6 @@ class Gym:
         msg: List[str] = []
         while True:
             line = self.proc.stdout.readline().strip()
-            logger.debug(line)
             if line == "":
                 raise EOFError
             if line.startswith(_REPL_PROMPT):
@@ -265,6 +276,7 @@ class Gym:
         self.proc.stdin.write(req + "\n")
         try:
             res, msg = self._read_next_line()
+            logger.debug(f"Response: {res}")
         except EOFError as exc:
             raise GymCrashError("EOF") from exc
         try:
@@ -285,5 +297,3 @@ class Gym:
                 self._submit_request(req)
             except (GymCrashError, json.decoder.JSONDecodeError):
                 pass
-
-        logger.debug(f"Exiting GYM for {self.mwe.name}")

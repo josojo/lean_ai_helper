@@ -26,6 +26,6 @@ def test_example_1() -> None:
     with Gym(mwe) as (gym, state_0):
         state_1 = gym.run_tac(
             state_0,
-            " exact(@disjoint_toFinset _ _ _ hs.fintype ht.fintype)",
+            "@disjoint_toFinset _ _ _ hs.fintype ht.fintype",
         )
         assert isinstance(state_1, ProofFinished)
