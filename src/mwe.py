@@ -1,6 +1,5 @@
 import re
 from typing import List
-from loguru import logger
 
 
 def parse_code(code: str, name: str) -> List[int]:
@@ -23,15 +22,13 @@ def parse_code(code: str, name: str) -> List[int]:
     theorem_start = match.start()
     proof_start = code.find(":=", theorem_start) + 2
     lines = code[proof_start:].split("\n")
-    logger.debug(f"lines: {lines[1:]}")
     proof_end = len(code)
+    proof_code = ""
     for i, line in enumerate(lines):
-        # Skip the first line
-        if i == 0:
-            continue
-        if not line.startswith(" "):
-            proof_end = proof_start + i
+        if i != 0 and not line.startswith(" "):
+            proof_end = proof_start + len(proof_code)
             break
+        proof_code += line + "\n"
     return [theorem_start, proof_start, proof_end]
 
 
