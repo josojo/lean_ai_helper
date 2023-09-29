@@ -116,17 +116,23 @@ class Tracer:
         content = AstContent(**data)
         self.tracing_result = content
 
-    def get_traced_tactic(self, tactics: List[TracedTacticState]) -> List[TracedTacticState]:
+    def get_traced_tactic(
+        self, tactics: List[TracedTacticState]
+    ) -> List[TracedTacticState]:
         """Get the tactics that are within the theorem."""
 
         code_bytes = self.mwe.code.encode("utf-8")
-        theorem_code = (self.mwe.code[self.mwe.theorem_start : self.mwe.proof_end]).encode("utf-8")
+        theorem_code = (
+            self.mwe.code[self.mwe.theorem_start : self.mwe.proof_end]
+        ).encode("utf-8")
         theorem_start_pos = code_bytes.find(theorem_code)
         assert theorem_start_pos != -1
         theorem_end_pos = theorem_start_pos + len(theorem_code)
         # Only consider tactics that are within the theorem.
         tactics = [
-            tactic for tactic in tactics if tactic.pos in range(theorem_start_pos, theorem_end_pos)
+            tactic
+            for tactic in tactics
+            if tactic.pos in range(theorem_start_pos, theorem_end_pos)
         ]
         # Some tactics are listed double - the normal tactic + the tactic within a tactic.
         j = 0
@@ -136,7 +142,10 @@ class Tracer:
                 if i == j:
                     i += 1
                     continue
-                if tactics[i].pos >= tactics[j].pos and tactics[i].end_pos <= tactics[j].end_pos:
+                if (
+                    tactics[i].pos >= tactics[j].pos
+                    and tactics[i].end_pos <= tactics[j].end_pos
+                ):
                     tactics.remove(tactics[i])
                     i -= 1
                 i += 1
@@ -151,7 +160,9 @@ class Tracer:
         for premise in self.tracing_result.premises:
             code_splitted = self.mwe.code.split("\n")
             code_before_premises = "\n".join(code_splitted[0 : premise.pos.line - 1])
-            string_pos = len(code_before_premises.encode("utf-8")) + premise.end_pos.column
+            string_pos = (
+                len(code_before_premises.encode("utf-8")) + premise.end_pos.column
+            )
             if string_pos in range(tactic.pos, tactic.end_pos):
                 used_premises.append(premise)
         return used_premises
