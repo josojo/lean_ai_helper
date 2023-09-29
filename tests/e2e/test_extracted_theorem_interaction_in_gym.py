@@ -27,15 +27,12 @@ def test_extracted_theorem_interaction_in_gym() -> None:
 
     # Get tactics
     code_bytes = code.encode("utf-8")
-    tactics = mwe.get_traced_tactic(ast_content.tatics)
+    tactics = tracer.get_traced_tactic(ast_content.tatics)
 
     # Check tactics in gym
     with Gym(mwe) as (gym, state_0):
         state_1 = gym.run_tacs(
             state_0,
-            [
-                (code_bytes[tactic.pos : tactic.end_pos]).decode("utf-8")
-                for tactic in tactics
-            ],
+            [(code_bytes[tactic.pos : tactic.end_pos]).decode("utf-8") for tactic in tactics],
         )
         assert isinstance(state_1, ProofFinished)
