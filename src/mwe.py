@@ -49,3 +49,17 @@ class Mwe:
         self.code = code
         self.name = name
         [self.theorem_start, self.proof_start, self.proof_end] = parse_code(code, name)
+
+    def rewrite_to_tactic_style(self) -> None:
+        """Rewrite the code to tactic style."""
+        code = self.code
+        # Rewrite the code in tactic style
+        tactic_style_code = (
+            code[: self.proof_start]
+            + " by exact ("
+            + code[self.proof_start : self.proof_end]
+            + ")"
+            + code[self.proof_end :]
+        )
+        self.proof_end += len(" by exact ()")
+        self.code = tactic_style_code
