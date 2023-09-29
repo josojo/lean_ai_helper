@@ -23,6 +23,7 @@ def test_example_1() -> None:
         code,
         "disjoint_toFinset",
     )
+
     with Gym(mwe) as (gym, state_0):
         state_1 = gym.run_tac(
             state_0,
