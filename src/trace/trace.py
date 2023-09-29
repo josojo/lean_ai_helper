@@ -1,7 +1,7 @@
 import os
 import json
 
-from typing import Optional, Any, List
+from typing import Optional, Any, List, Dict
 from pathlib import Path
 
 import humps
@@ -23,6 +23,11 @@ class PosEncoding:
         self.line = line
         self.column = column
 
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, PosEncoding):
+            return self.line == other.line and self.column == other.column
+        return False
+
 
 class Premise:
     pos: PosEncoding
@@ -34,17 +39,17 @@ class Premise:
 
     def __init__(
         self,
-        pos: PosEncoding,
+        pos: Dict[str, int],
         mod_name: str,
         full_name: str,
-        end_pos: PosEncoding,
+        end_pos: Dict[str, int],
         def_pos: PosEncoding,
         def_end_pos: PosEncoding,
     ):
-        self.pos = pos
+        self.pos = PosEncoding(**pos)
         self.mod_name = mod_name
         self.full_name = full_name
-        self.end_pos = end_pos
+        self.end_pos = PosEncoding(**end_pos)
         self.def_pos = def_pos
         self.def_end_pos = def_end_pos
 
@@ -71,6 +76,7 @@ class TracedTacticState:
 class AstContent:
     tatics: List[TracedTacticState]
     premises: List[Premise]
+    command_as_ts: List[Any]
 
     def __init__(
         self,
@@ -93,8 +99,9 @@ class Tracer:
         self.mwe = mwe
         self.execution_env = ExecutionEnv(tmp_dir)
         self.execution_env.write_main_file(mwe.code)
+        self.tracing_result: Optional[AstContent] = None
 
-    def trace_mwe(self) -> AstContent:
+    def trace_mwe(self) -> None:
         self.execution_env.create_env()
         self.execution_env.write_main_file(self.mwe.code)
         os.chdir(self.execution_env.tmp_dir)
@@ -102,11 +109,14 @@ class Tracer:
             ExtractData.lean {self.execution_env.tmp_dir}/Main.lean"
         os.system(command)
         path = self.execution_env.tmp_dir / "build/ir/Main.ast.json"
+        self.load_trace_result(path)
+
+    def load_trace_result(self, path: Path) -> None:
         with open(path, "r", encoding="utf-8") as file:
             data = json.load(file)
         data = humps.decamelize(data)
         content = AstContent(**data)
-        return content
+        self.tracing_result = content
 
     def get_traced_tactic(
         self, tactics: List[TracedTacticState]
@@ -143,3 +153,18 @@ class Tracer:
                 i += 1
             j += 1
         return tactics
+
+    def get_premises_from_tactic(self, tactic: TracedTacticState) -> List[Premise]:
+        """Get the premises that are used in the tactic."""
+        assert self.tracing_result is not None
+
+        used_premises = []
+        for premise in self.tracing_result.premises:
+            code_splitted = self.mwe.code.split("\n")
+            code_before_premises = "\n".join(code_splitted[0 : premise.pos.line - 1])
+            string_pos = (
+                len(code_before_premises.encode("utf-8")) + premise.end_pos.column
+            )
+            if string_pos in range(tactic.pos, tactic.end_pos):
+                used_premises.append(premise)
+        return used_premises

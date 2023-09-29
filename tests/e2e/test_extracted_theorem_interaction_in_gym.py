@@ -21,13 +21,13 @@ def test_extracted_theorem_interaction_in_gym() -> None:
         "minFacHelper_0",
     )
     tracer = Tracer(mwe)
-    ast_content = tracer.trace_mwe()
-    assert isinstance(ast_content, AstContent)
-    assert len(ast_content.tatics) == 17
 
+    tracer.load_trace_result(
+        os.path.join(script_dir, "../data/tracing_results/Main.ast.json")
+    )
     # Get tactics
     code_bytes = code.encode("utf-8")
-    tactics = tracer.get_traced_tactic(ast_content.tatics)
+    tactics = tracer.get_traced_tactic(tracer.tracing_result.tatics)
 
     # Check tactics in gym
     with Gym(mwe) as (gym, state_0):

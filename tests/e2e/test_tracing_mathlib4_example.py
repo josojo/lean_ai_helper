@@ -4,10 +4,10 @@ import os
 from loguru import logger
 
 from src.mwe import Mwe
-from src.trace.trace import AstContent, Tracer
+from src.trace.trace import AstContent, PosEncoding, Tracer
 
 
-def test_example_1() -> None:
+def test_tracing_file() -> None:
     """Test the example from https://leanprover-community.github.io/mwe.html."""
 
     code = ""
@@ -24,20 +24,20 @@ def test_example_1() -> None:
         "minFacHelper_0",
     )
     tracer = Tracer(mwe)
-    ast_content = tracer.trace_mwe()
-    assert isinstance(ast_content, AstContent)
-    assert len(ast_content.tatics) == 17
+    tracer.trace_mwe()
+    assert isinstance(tracer.tracing_result, AstContent)
+    assert len(tracer.tracing_result.tatics) == 17
 
     # Check tactics
     code = code.encode("utf-8")
-    tactic = ast_content.tatics[0]
+    tactic = tracer.tracing_result.tatics[0]
     tatic_code = (code[tactic.pos : tactic.end_pos]).decode("utf-8")
     assert tatic_code == "have : 2 < minFac n := h.1.trans_le h.2.2"
 
     # Check premises
-    premise = ast_content.premises[-1]
+    premise = tracer.tracing_result.premises[-1]
     assert premise.mod_name == "Init.Core"
     assert premise.full_name == "Iff.mp"
-    assert premise.pos == {"line": 41, "column": 41}
-    assert premise.end_pos == {"line": 41, "column": 42}
+    assert premise.pos == PosEncoding(41, 41)
+    assert premise.end_pos == PosEncoding(41, 42)
     assert premise.def_pos == {"line": 90, "column": 2}
