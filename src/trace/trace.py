@@ -49,7 +49,7 @@ class Premise:
         self.def_end_pos = def_end_pos
 
 
-class TacticState:
+class TracedTacticState:
     state_before: str
     state_after: str
     pos: int
@@ -69,7 +69,7 @@ class TacticState:
 
 
 class AstContent:
-    tatics: List[TacticState]
+    tatics: List[TracedTacticState]
     premises: List[Premise]
 
     def __init__(
@@ -78,7 +78,7 @@ class AstContent:
         premises: List[Any],
         command_as_ts: List[Any],
     ):
-        self.tatics = list(map(lambda tac: TacticState(**tac), tactics))
+        self.tatics = list(map(lambda tac: TracedTacticState(**tac), tactics))
         self.premises = list(map(lambda pre: Premise(**pre), premises))
         self.command_as_ts = command_as_ts
 
@@ -107,3 +107,39 @@ class Tracer:
         data = humps.decamelize(data)
         content = AstContent(**data)
         return content
+
+    def get_traced_tactic(
+        self, tactics: List[TracedTacticState]
+    ) -> List[TracedTacticState]:
+        """Get the tactics that are within the theorem."""
+
+        code_bytes = self.mwe.code.encode("utf-8")
+        theorem_code = (
+            self.mwe.code[self.mwe.theorem_start : self.mwe.proof_end]
+        ).encode("utf-8")
+        theorem_start_pos = code_bytes.find(theorem_code)
+        assert theorem_start_pos != -1
+        theorem_end_pos = theorem_start_pos + len(theorem_code)
+        # Only consider tactics that are within the theorem.
+        tactics = [
+            tactic
+            for tactic in tactics
+            if tactic.pos in range(theorem_start_pos, theorem_end_pos)
+        ]
+        # Some tactics are listed double - the normal tactic + the tactic within a tactic.
+        j = 0
+        while j < len(tactics):
+            i = 0
+            while i < len(tactics):
+                if i == j:
+                    i += 1
+                    continue
+                if (
+                    tactics[i].pos >= tactics[j].pos
+                    and tactics[i].end_pos <= tactics[j].end_pos
+                ):
+                    tactics.remove(tactics[i])
+                    i -= 1
+                i += 1
+            j += 1
+        return tactics
