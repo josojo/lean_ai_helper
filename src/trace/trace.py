@@ -23,8 +23,10 @@ class PosEncoding:
         self.line = line
         self.column = column
 
-    def __eq__(self, other):
-        return self.line == other.line and self.column == other.column
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, PosEncoding):
+            return self.line == other.line and self.column == other.column
+        return False
 
 
 class Premise:
