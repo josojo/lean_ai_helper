@@ -4,7 +4,7 @@ import os
 from loguru import logger
 
 from src.mwe import Mwe
-from src.trace.trace import AstContent, Tracer
+from src.trace.trace import AstContent, PosEncoding, Tracer
 
 
 def test_tracing_file() -> None:
@@ -38,6 +38,6 @@ def test_tracing_file() -> None:
     premise = tracer.tracing_result.premises[-1]
     assert premise.mod_name == "Init.Core"
     assert premise.full_name == "Iff.mp"
-    assert premise.pos == {"line": 41, "column": 41}
-    assert premise.end_pos == {"line": 41, "column": 42}
+    assert premise.pos == PosEncoding(41, 41)
+    assert premise.end_pos == PosEncoding(41, 42)
     assert premise.def_pos == {"line": 90, "column": 2}
