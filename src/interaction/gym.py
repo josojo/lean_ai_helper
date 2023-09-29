@@ -11,9 +11,9 @@ from typing import Union, List, Optional, Tuple, Dict
 from loguru import logger
 
 from src.lean_env.execution_env import ExecutionEnv
-from src.interaction.goals import Goal, parse_goals
 from src.mwe import Mwe
 from src.interaction.utils import format_tatic_for_repl
+from src.state.goals import Goal, parse_goals
 
 _REPL_PROMPT = "REPL>"
 
