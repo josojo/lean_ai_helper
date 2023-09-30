@@ -72,6 +72,11 @@ class TracedTacticState:
         self.pos = pos
         self.end_pos = end_pos
 
+    def is_tactic_finishing_proof(self) -> bool:
+        if self.state_after.find("no goals") != -1:
+            return True
+        return False
+
 
 class AstContent:
     tatics: List[TracedTacticState]
