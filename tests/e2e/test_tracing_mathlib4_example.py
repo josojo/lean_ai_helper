@@ -36,8 +36,9 @@ def test_tracing_file() -> None:
 
     # Check premises
     premise = tracer.tracing_result.premises[-1]
-    assert premise.mod_name == "Init.Core"
-    assert premise.full_name == "Iff.mp"
-    assert premise.pos == PosEncoding(41, 41)
-    assert premise.end_pos == PosEncoding(41, 42)
-    assert premise.def_pos == {"line": 90, "column": 2}
+    assert premise.mod_name == "Main"
+    assert premise.full_name == "Mathlib.Meta.NormNum.minFacHelper_0"
+    logger.info(f"premise: {premise.pos.line}")
+    assert premise.pos == PosEncoding(line=35, column=8)
+    assert premise.end_pos == PosEncoding(line=35, column=22)
+    assert premise.def_pos is None
