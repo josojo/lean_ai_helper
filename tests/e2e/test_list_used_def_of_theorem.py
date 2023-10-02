@@ -24,7 +24,9 @@ def test_list_used_def_of_theorem() -> None:
         "minFacHelper_0",
     )
     tracer = Tracer(mwe)
-    tracer.load_trace_result(os.path.join(script_dir, "../data/tracing_results/Main.ast.json"))
+    tracer.load_trace_result(
+        os.path.join(script_dir, "../data/tracing_results/Main.ast.json")
+    )
 
     premises = tracer.get_defintions_used_in_theorem()
     logger.info(f"used premises: {list(map(lambda x: x.full_name, premises))}")
