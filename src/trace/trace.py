@@ -187,7 +187,7 @@ class Tracer:
     def get_defintions_used_in_theorem(self) -> List[Premise]:
         assert self.tracing_result is not None
         splitted_code = self.mwe.code.split("\n")
-        used_definitions = []
+        used_definitions: List[Premise] = []
         for premise in self.tracing_result.premises:
             premise_start_pos = (
                 len("\n".join(splitted_code[: premise.pos.line - 1]))
