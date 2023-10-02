@@ -46,10 +46,16 @@ class Premise:
         def_pos: PosEncoding,
         def_end_pos: PosEncoding,
     ):
-        self.pos = PosEncoding(**pos)
+        if pos is None:
+            self.pos = None
+        else:
+            self.pos = PosEncoding(**pos)
         self.mod_name = mod_name
         self.full_name = full_name
-        self.end_pos = PosEncoding(**end_pos)
+        if end_pos is None:
+            self.end_pos = None
+        else:
+            self.end_pos = PosEncoding(**end_pos)
         self.def_pos = def_pos
         self.def_end_pos = def_end_pos
 
@@ -121,6 +127,10 @@ class Tracer:
             data = json.load(file)
         data = humps.decamelize(data)
         content = AstContent(**data)
+        content.tatics = [tactic for tactic in content.tatics if tactic.pos is not None]
+        content.premises = [
+            premise for premise in content.premises if premise.pos is not None
+        ]
         self.tracing_result = content
 
     def get_traced_tactic(
@@ -173,3 +183,29 @@ class Tracer:
             if string_pos in range(tactic.pos, tactic.end_pos):
                 used_premises.append(premise)
         return used_premises
+
+    def get_defintions_used_in_theorem(self) -> List[Premise]:
+        assert self.tracing_result is not None
+        splitted_code = self.mwe.code.split("\n")
+        used_definitions = []
+        for premise in self.tracing_result.premises:
+            premise_start_pos = (
+                len("\n".join(splitted_code[: premise.pos.line - 1]))
+                + premise.pos.column
+            )
+
+            premise_end_pos = (
+                len("\n".join(splitted_code[: premise.end_pos.line - 1]))
+                + premise.end_pos.column
+            )
+
+            if premise_start_pos in range(
+                self.mwe.theorem_start, self.mwe.proof_start
+            ) and premise_end_pos in range(
+                self.mwe.theorem_start, self.mwe.proof_start
+            ):
+                if premise.full_name not in list(
+                    map(lambda x: x.full_name, used_definitions)
+                ):
+                    used_definitions.append(premise)
+        return used_definitions
