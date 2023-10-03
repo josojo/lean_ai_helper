@@ -1,7 +1,7 @@
 from typing import List
 
 
-def format_tatic_for_repl(proof: str) -> List[str]:
+def format_tactic_for_repl(proof: str) -> List[str]:
     if proof.startswith(" by\n"):
         proof = proof[5:]
     elif proof.startswith(" by"):

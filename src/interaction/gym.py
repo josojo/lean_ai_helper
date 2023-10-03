@@ -12,8 +12,9 @@ from loguru import logger
 
 from src.lean_env.execution_env import ExecutionEnv
 from src.mwe import Mwe
-from src.interaction.utils import format_tatic_for_repl
+from src.interaction.utils import format_tactic_for_repl
 from src.state.goals import Goal, parse_goals
+from src.trace.trace import TracedTacticState
 
 _REPL_PROMPT = "REPL>"
 
@@ -86,10 +87,12 @@ class Gym:
     def __init__(
         self,
         mwe: Mwe,
+        tactic: Optional[TracedTacticState] = None,
         tmp_dir: Optional[Path] = None,
     ):
         """Initialize Gym."""
         self.mwe = mwe
+        self.tactic: Optional[TracedTacticState] = tactic
         self.proc: Optional[subprocess.Popen[str]] = None
         self.execution_env = ExecutionEnv(tmp_dir)
         self.is_crashed = False
@@ -149,7 +152,7 @@ class Gym:
 
         tsid = state.identity
 
-        tactic_array = format_tatic_for_repl(tactic)
+        tactic_array = format_tactic_for_repl(tactic)
         return self._submit_tactics(tsid, tactic_array)
 
     def run_tacs(self, state: TacticState, tactics: List[str]) -> TacticResult:
@@ -196,17 +199,33 @@ class Gym:
 
     def _modify_proof(self) -> str:
         # Modify the proof and set up the `repl` tactic.
-        code_proof = "\nby\n  lean_dojo_repl\n  sorry\n"
+        code_proof = "\n  by\n  lean_dojo_repl\n  sorry\n"
         code_before_theorem = self.mwe.code[: self.mwe.theorem_start]
-        code_thereom = self.mwe.code[self.mwe.theorem_start : self.mwe.proof_start]
-        modified_code = (
-            "import Lean4Repl\n\n"
-            + code_before_theorem
-            + "set_option maxHeartbeats 0 in\n"
-            + code_thereom
-            + code_proof
-            + self.mwe.code[self.mwe.proof_end :]
-        )
+        code_thereom = ""
+        if self.tactic is None:
+            code_thereom = self.mwe.code[self.mwe.theorem_start : self.mwe.proof_start]
+            modified_code = (
+                "import Lean4Repl\n\n"
+                + code_before_theorem
+                + "set_option maxHeartbeats 0 in\n"
+                + code_thereom
+                + code_proof
+                + self.mwe.code[self.mwe.proof_end :]
+            )
+        else:  # Modify the proof to start from the given tactic.
+            code_as_bytes = self.mwe.code.encode("utf-8")
+            code_cutted_of_at_tactic = code_as_bytes[: self.tactic.pos].decode("utf-8")
+            code_thereom = (
+                code_cutted_of_at_tactic[self.mwe.theorem_start :]
+                + "lean_dojo_repl\n sorry\n"
+            )
+            modified_code = (
+                "import Lean4Repl\n\n"
+                + code_before_theorem
+                + "set_option maxHeartbeats 0 in\n"
+                + code_thereom
+                + self.mwe.code[self.mwe.proof_end :]
+            )
         return modified_code
 
     def _read_next_line(self) -> Tuple[str, str]:
@@ -297,3 +316,7 @@ class Gym:
                 self._submit_request(req)
             except (GymCrashError, json.decoder.JSONDecodeError):
                 pass
+        else:
+            logger.error(
+                f"Crashed gym instance can not be cleanly shut down: {self.is_crashed}"
+            )

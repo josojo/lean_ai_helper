@@ -2,6 +2,19 @@ import re
 from typing import List
 
 
+def all_brackets_closed(code: str) -> bool:
+    opening_parenthesis = ["(", "{", "[", "\u27e8"]
+    closing_parenthesis = [")", "}", "]", "\u27e9"]
+    # iterate over the index of the commands
+    for opening, closing in zip(opening_parenthesis, closing_parenthesis):
+        # count the number of opening and closing parenthesis
+        num_opening = code.count(opening)
+        num_closing = code.count(closing)
+        if num_opening > num_closing:
+            return False
+    return True
+
+
 def parse_code(code: str, name: str) -> List[int]:
     """
     This function parses the code to find the start and end positions of the theorem and its proof.
@@ -19,8 +32,10 @@ def parse_code(code: str, name: str) -> List[int]:
     match = theorem_pattern.search(code)
     if match is None:
         raise ValueError(f"Theorem {name} not found in code.")
-    theorem_start = match.start()
+    theorem_start = match.start() + 1
     proof_start = code.find(":=", theorem_start) + 2
+    while not all_brackets_closed(code[theorem_start:proof_start]):
+        proof_start = code.find(":=", proof_start) + 2
     lines = code[proof_start:].split("\n")
     proof_end = len(code)
     proof_code = ""

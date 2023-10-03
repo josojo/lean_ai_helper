@@ -12,7 +12,6 @@ class ExecutionEnv:
             self.tmp_dir = (
                 Path(__file__).parent.parent.parent.absolute() / "execution_env"
             )
-            logger.debug(f"Using default tmp_dir: {self.tmp_dir}")
         else:
             self.tmp_dir = tmp_dir
 
