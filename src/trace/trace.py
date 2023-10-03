@@ -83,6 +83,12 @@ class TracedTacticState:
             return True
         return False
 
+    def get_syntax_of_tactic(self, code: bytes) -> str:
+        code_before_tactic = code[0 : self.pos]
+        num_of_spaces = len(code_before_tactic) - len(code_before_tactic.rstrip())
+        spaces_str = " " * (num_of_spaces - 1)
+        return spaces_str + (code[self.pos : self.end_pos]).decode("utf-8")
+
 
 class AstContent:
     tatics: List[TracedTacticState]
@@ -164,7 +170,7 @@ class Tracer:
                     and tactics[i].end_pos <= tactics[j].end_pos
                 ):
                     tactics.remove(tactics[i])
-                    i -= 1
+                    continue
                 i += 1
             j += 1
         return tactics

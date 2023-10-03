@@ -4,18 +4,9 @@ import re
 from typing import List
 from pathlib import Path
 from loguru import logger
+from src.interaction.utils import get_theorem_names_from_code
 
 from src.mwe import Mwe
-
-
-def get_theorem_names_from_code(code: str) -> List[str]:
-    theorem_names = []
-    lines = code.split("\n")
-    for line in lines:
-        match = re.search(r"\btheorem\b\s+(\w+)", line)
-        if match:
-            theorem_names.append(match.group(1))
-    return theorem_names
 
 
 def rewrite_all_proofs_in_tactic_style(
@@ -46,9 +37,11 @@ def rewrite_all_proofs_in_tactic_style(
 if __name__ == "__main__":
     script_dir = os.path.dirname(os.path.realpath(__file__))
     file_path = os.path.join(
-        script_dir, "../../tests/data/Mathlib.Algebra.Algebra.Basic.lean"
+        script_dir,
+        "../../tests/data/Mathlib.Analysis.Complex.UpperHalfPlane.Metric.lean",
     )
     file_path_new = os.path.join(
-        script_dir, "../../tests/data/Mathlib.Algebra.Algebra.Basic_rewrite.lean"
+        script_dir,
+        "../../tests/data/Mathlib.Analysis.Complex.UpperHalfPlane.Metric_rewrite.lean",
     )
     rewrite_all_proofs_in_tactic_style(file_path, file_path_new)

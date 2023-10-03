@@ -32,12 +32,14 @@ def evaluate_all_tactics_of_file_in_gym(
         theorem_names[0],
     )
     tracer = Tracer(mwe)
-    tracer.trace_mwe()
+    # tracer.trace_mwe()
 
     tactic_counter = 0
     success = 0
     for theorem_name in theorem_names:
         logger.debug(f"Testing with theorem: {theorem_name}")
+        # if theorem_name != "image_coe_closedBall":
+        #     continue
         mwe = Mwe(
             code,
             theorem_name,
@@ -49,25 +51,26 @@ def evaluate_all_tactics_of_file_in_gym(
         tactics = tracer.get_traced_tactic(tracer.tracing_result.tatics)
         logger.debug(f"number of tactics: len({len(tactics)})")
         tactics.sort(key=lambda x: x.pos)
+
+        tactic_terms = list(
+            map(lambda x: (code_bytes[x.pos : x.end_pos]).decode("utf-8"), tactics)
+        )
+        logger.debug(f"tactics: {tactic_terms}")
         finishing_tactics = [
             tactic for tactic in tactics if tactic.is_tactic_finishing_proof()
         ]
         logger.debug(f"number of finishing tactics: {len(finishing_tactics)}")
 
         for tactic in finishing_tactics:
-            logger.debug(
-                "testing tactic"
-                + (code_bytes[tactic.pos : tactic.end_pos]).decode("utf-8")
-            )
             tactic_counter += 1
             # Check tactics in gym
             with Gym(mwe) as (gym, state_0):
                 cmds = [
-                    (code_bytes[pre_tactic.pos : pre_tactic.end_pos]).decode("utf-8")
+                    pre_tactic.get_syntax_of_tactic(code_bytes)
                     for pre_tactic in tactics
                     if pre_tactic.end_pos < tactic.pos
                 ]
-                cmds.append((code_bytes[tactic.pos : tactic.end_pos]).decode("utf-8"))
+                cmds.append(tactic.get_syntax_of_tactic(code_bytes))
                 logger.debug(f"cmds: {cmds}")
                 state_1 = gym.run_tacs(
                     state_0,
@@ -93,7 +96,8 @@ def evaluate_all_tactics_of_file_in_gym(
 if __name__ == "__main__":
     script_dir = os.path.dirname(os.path.realpath(__file__))
     file_path = os.path.join(
-        script_dir, "../tests/data/Mathlib.Algebra.Algebra.Basic_rewrite.lean"
+        script_dir,
+        "../tests/data/Mathlib.Analysis.Complex.UpperHalfPlane.Metric_rewrite.lean",
     )
     # tracing_result_path = os.path.join(
     #     script_dir, "../tests/data/tracing_results/Algebra.Basics.Main.ast.json"
