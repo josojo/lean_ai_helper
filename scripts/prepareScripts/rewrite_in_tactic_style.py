@@ -1,7 +1,5 @@
 import os
-import re
 
-from typing import List
 from pathlib import Path
 from loguru import logger
 from src.interaction.utils import get_theorem_names_from_code

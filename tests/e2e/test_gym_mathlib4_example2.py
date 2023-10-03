@@ -1,6 +1,4 @@
-import pytest
 import os
-from loguru import logger
 from src.interaction.gym import Gym, ProofFinished
 from src.mwe import Mwe
 

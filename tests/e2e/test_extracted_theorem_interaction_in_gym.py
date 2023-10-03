@@ -1,8 +1,7 @@
-import pytest
 import os
 
 from src.mwe import Mwe
-from src.trace.trace import AstContent, Tracer
+from src.trace.trace import Tracer
 from src.interaction.gym import Gym, ProofFinished
 
 

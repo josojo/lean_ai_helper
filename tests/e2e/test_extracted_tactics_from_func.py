@@ -1,10 +1,10 @@
-import pytest
 import os
 
-from src.mwe import Mwe
-from src.trace.trace import AstContent, Tracer
-from src.interaction.gym import Gym, ProofFinished
 from loguru import logger
+
+from src.mwe import Mwe
+from src.trace.trace import Tracer
+from src.interaction.gym import Gym, ProofFinished
 
 
 def test_extracted_theorem_interaction_in_gym() -> None:
