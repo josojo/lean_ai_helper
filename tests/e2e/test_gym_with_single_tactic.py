@@ -48,6 +48,6 @@ def test_example_1() -> None:
     with Gym(mwe, tactic) as (gym, state_0):
         state_1 = gym.run_tacs(
             state_0,
-            [(code_bytes[tactic.pos : tactic.end_pos]).decode("utf-8")],
+            [tactic.get_syntax_of_tactic(code_bytes)],
         )
         assert state_1.message == ""

@@ -7,20 +7,11 @@ import re
 from typing import List
 from pathlib import Path
 from loguru import logger
+from src.interaction.utils import get_theorem_names_from_code
 
 from src.mwe import Mwe
 from src.trace.trace import Tracer
 from src.interaction.gym import Gym, ProofFinished
-
-
-def get_theorem_names_from_code(code: str) -> List[str]:
-    theorem_names = []
-    lines = code.split("\n")
-    for line in lines:
-        match = re.search(r"\btheorem\b\s+(\w+)", line)
-        if match:
-            theorem_names.append(match.group(1))
-    return theorem_names
 
 
 def evaluate_all_tactics_of_file_in_gym(
