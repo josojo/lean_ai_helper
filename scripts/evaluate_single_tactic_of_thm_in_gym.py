@@ -1,3 +1,6 @@
+# before running this script, one should run the rewriting_in_tactic_style.py script to generate the file with the tactic style code
+
+
 import os
 import re
 
@@ -32,6 +35,13 @@ def evaluate_all_tactics_of_file_in_gym(
 
     code_bytes = code.encode("utf-8")
     theorem_names = get_theorem_names_from_code(code)
+    # trace only once the first theorem to save the updated tracing data
+    mwe = Mwe(
+        code,
+        theorem_names[0],
+    )
+    tracer = Tracer(mwe)
+    tracer.trace_mwe()
 
     tactic_counter = 0
     success = 0
@@ -41,14 +51,17 @@ def evaluate_all_tactics_of_file_in_gym(
             code,
             theorem_name,
         )
+
         tracer = Tracer(mwe)
         tracer.load_trace_result(tracing_res_path)
         # Get tactics
         tactics = tracer.get_traced_tactic(tracer.tracing_result.tatics)
+        logger.debug(f"number of tactics: len({len(tactics)})")
         tactics.sort(key=lambda x: x.pos)
         finishing_tactics = [
             tactic for tactic in tactics if tactic.is_tactic_finishing_proof()
         ]
+        logger.debug(f"number of finishing tactics: {len(finishing_tactics)}")
 
         for tactic in finishing_tactics:
             logger.debug(
@@ -89,9 +102,12 @@ def evaluate_all_tactics_of_file_in_gym(
 if __name__ == "__main__":
     script_dir = os.path.dirname(os.path.realpath(__file__))
     file_path = os.path.join(
-        script_dir, "../tests/data/Mathlib.Algebra.Algebra.Basic.lean"
+        script_dir, "../tests/data/Mathlib.Algebra.Algebra.Basic_rewrite.lean"
     )
+    # tracing_result_path = os.path.join(
+    #     script_dir, "../tests/data/tracing_results/Algebra.Basics.Main.ast.json"
+    # )
     tracing_result_path = os.path.join(
-        script_dir, "../tests/data/tracing_results/Algebra.Basics.Main.ast.json"
+        script_dir, "../execution_env/build/ir/Main.ast.json"
     )
     evaluate_all_tactics_of_file_in_gym(file_path, tracing_result_path)

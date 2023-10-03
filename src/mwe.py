@@ -68,12 +68,16 @@ class Mwe:
     def rewrite_to_tactic_style(self) -> None:
         """Rewrite the code to tactic style."""
         code = self.code
+        if code[self.proof_start : self.proof_end].strip().startswith("by"):
+            return
+        if code[self.proof_start : self.proof_end].strip().startswith("|"):
+            return
         # Rewrite the code in tactic style
         tactic_style_code = (
             code[: self.proof_start]
             + " by exact ("
-            + code[self.proof_start : self.proof_end]
-            + ")"
+            + code[self.proof_start : self.proof_end - 1]
+            + ")\n"
             + code[self.proof_end :]
         )
         self.proof_end += len(" by exact ()")
