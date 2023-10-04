@@ -3,24 +3,17 @@ import os
 from src.mwe import Mwe
 from src.trace.trace import Tracer
 from src.interaction.gym import Gym, ProofFinished
+from tests.utils.utils import read_code_from_file
 
 
 def test_extracted_theorem_interaction_in_gym() -> None:
-    code = ""
-    script_dir = os.path.dirname(os.path.realpath(__file__))
-    file_path = os.path.join(script_dir, "../data/Mathlib.Meta.NormNum.Prime.lean")
-
-    # Open the file using the absolute path
-    file = open(file_path, "r", encoding="utf-8")
-    code = file.read()
-    file.close()
-
+    code = read_code_from_file("../data/Mathlib.Meta.NormNum.Prime.lean")
     mwe = Mwe(
         code,
         "minFacHelper_0",
     )
     tracer = Tracer(mwe)
-
+    script_dir = os.path.dirname(os.path.realpath(__file__))
     tracer.load_trace_result(
         os.path.join(script_dir, "../data/tracing_results/Main.ast.json")
     )

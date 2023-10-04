@@ -16,17 +16,20 @@ class TestUndoLineSplits(unittest.TestCase):
         ]
 
         expected = [
-            "rw [\u2190 h3, mul_comm n1, mul_assoc n2, \u2190 mul_assoc n1, h1,\n      \u2190 mul_assoc n2, mul_comm n2, mul_assoc, h2]"
+            "rw [\u2190 h3, mul_comm n1, mul_assoc n2, \u2190 mul_assoc n1, h1,\n\
+      \u2190 mul_assoc n2, mul_comm n2, mul_assoc, h2]"
         ]
         self.assertEqual(undo_line_splits_for_unclosed_parenthesis(commands), expected)
 
         commands = [
             "haveI : DecidablePred p := fun i \u21a6 Classical.propDecidable (p i)",
-            "  exact \u27e8fun i => if hi : p i then f \u27e8i, hi\u27e9 else Classical.choice (ne i), \n funext fun i \u21a6 dif_pos i.2\u27e9",
+            "  exact \u27e8fun i => if hi : p i then f \u27e8i, hi\u27e9 else \
+            Classical.choice (ne i), \n funext fun i \u21a6 dif_pos i.2\u27e9",
         ]
         expected = [
             "haveI : DecidablePred p := fun i \u21a6 Classical.propDecidable (p i)",
-            "  exact \u27e8fun i => if hi : p i then f \u27e8i, hi\u27e9 else Classical.choice (ne i), \n funext fun i \u21a6 dif_pos i.2\u27e9",
+            "  exact \u27e8fun i => if hi : p i then f \u27e8i, hi\u27e9 else \
+            Classical.choice (ne i), \n funext fun i \u21a6 dif_pos i.2\u27e9",
         ]
         self.assertEqual(undo_line_splits_for_unclosed_parenthesis(commands), expected)
 
@@ -48,14 +51,16 @@ class TestUndoLineSplits(unittest.TestCase):
 
         commands = [
             "refine ⟨by norm_num, by norm_num, ?_⟩",
-            "refine (le_minFac'.mpr λ p hp hpn ↦ ?_).resolve_left (Nat.ne_of_gt (Nat.le_of_ble_eq_true h1))",
+            "refine (le_minFac'.mpr λ p hp hpn ↦ ?_).resolve_left (Nat.ne_of_gt \
+            (Nat.le_of_ble_eq_true h1))",
             "rcases hp.eq_or_lt with rfl|h",
             "· simp [(Nat.dvd_iff_mod_eq_zero ..).1 hpn] at h2",
             "· exact h",
         ]
         expected = [
             "refine ⟨by norm_num, by norm_num, ?_⟩",
-            "refine (le_minFac'.mpr λ p hp hpn ↦ ?_).resolve_left (Nat.ne_of_gt (Nat.le_of_ble_eq_true h1))",
+            "refine (le_minFac'.mpr λ p hp hpn ↦ ?_).resolve_left (Nat.ne_of_gt \
+            (Nat.le_of_ble_eq_true h1))",
             "rcases hp.eq_or_lt with rfl|h",
             "· simp [(Nat.dvd_iff_mod_eq_zero ..).1 hpn] at h2",
             "· exact h",

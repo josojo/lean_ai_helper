@@ -8,7 +8,6 @@ from src.trace.trace import AstContent, PosEncoding, Tracer
 
 def test_tracing_file() -> None:
     """Test the example from https://leanprover-community.github.io/mwe.html."""
-
     code = ""
     script_dir = os.path.dirname(os.path.realpath(__file__))
     file_path = os.path.join(script_dir, "../data/Mathlib.Meta.NormNum.Prime.lean")

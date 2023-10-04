@@ -1,21 +1,11 @@
-import os
 from src.interaction.gym import Gym, ProofFinished
 from src.mwe import Mwe
+from tests.utils.utils import read_code_from_file
 
 
 def test_example_1() -> None:
     """Test the example from https://leanprover-community.github.io/mwe.html."""
-    code = ""
-    # Get the absolute path to the directory of the current script
-    script_dir = os.path.dirname(os.path.realpath(__file__))
-
-    # Join the script directory with the relative path to the file
-    file_path = os.path.join(script_dir, "../data/Mathlib.Data.Set.Finite.lean")
-
-    # Open the file using the absolute path
-    file = open(file_path, "r", encoding="utf-8")
-    code = file.read()
-    file.close()
+    code = read_code_from_file("../data/Mathlib.Data.Set.Finite.lean")
 
     mwe = Mwe(
         code,
