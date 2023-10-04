@@ -1,6 +1,3 @@
-import re
-
-
 def remove_comments(filename):
     with open(filename, "r", encoding="utf-8") as file:
         lines = file.readlines()

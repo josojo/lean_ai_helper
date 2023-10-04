@@ -5,16 +5,13 @@ from loguru import logger
 from src.interaction.utils import get_theorem_names_from_code
 
 from src.mwe import Mwe
+from tests.utils.utils import read_code_from_file
 
 
 def rewrite_all_proofs_in_tactic_style(
     file_with_code_path: Path, file_for_writing_result: Path
 ) -> None:
-    code = ""
-
-    file = open(file_with_code_path, "r", encoding="utf-8")
-    code = file.read()
-    file.close()
+    code = read_code_from_file(file_with_code_path)
 
     theorem_names = get_theorem_names_from_code(code)
 
