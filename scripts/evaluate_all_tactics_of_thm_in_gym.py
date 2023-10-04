@@ -7,17 +7,11 @@ from src.interaction.utils import get_theorem_names_from_code
 from src.mwe import Mwe
 from src.trace.trace import Tracer
 from src.interaction.gym import Gym, ProofFinished
+from tests.utils.utils import read_code_from_file
 
 
-def evaluate_all_tactics_of_file_in_gym(
-    file_with_code_path: Path, tracing_res_path: Path
-) -> None:
-    code = ""
-
-    # Open the file using the absolute path
-    file = open(file_with_code_path, "r", encoding="utf-8")
-    code = file.read()
-    file.close()
+def evaluate_all_tactics_of_file_in_gym(file_with_code_path: Path, tracing_res_path: Path) -> None:
+    code = read_code_from_file(file_with_code_path)
 
     code_bytes = code.encode("utf-8")
     theorem_names = get_theorem_names_from_code(code)
@@ -43,10 +37,7 @@ def evaluate_all_tactics_of_file_in_gym(
         with Gym(mwe) as (gym, state_0):
             state_1 = gym.run_tacs(
                 state_0,
-                [
-                    (code_bytes[tactic.pos : tactic.end_pos]).decode("utf-8")
-                    for tactic in tactics
-                ],
+                [(code_bytes[tactic.pos : tactic.end_pos]).decode("utf-8") for tactic in tactics],
             )
             if isinstance(state_1, ProofFinished):
                 success += 1
@@ -60,9 +51,7 @@ def evaluate_all_tactics_of_file_in_gym(
 
 if __name__ == "__main__":
     script_dir = os.path.dirname(os.path.realpath(__file__))
-    file_path = os.path.join(
-        script_dir, "../tests/data/Mathlib.Algebra.Algebra.Basic.lean"
-    )
+    file_path = os.path.join(script_dir, "../tests/data/Mathlib.Algebra.Algebra.Basic.lean")
     tracing_result_path = os.path.join(
         script_dir, "../tests/data/tracing_results/Algebra.Basics.Main.ast.json"
     )

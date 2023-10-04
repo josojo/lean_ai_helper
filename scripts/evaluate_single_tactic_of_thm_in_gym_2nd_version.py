@@ -10,17 +10,11 @@ from src.interaction.utils import get_theorem_names_from_code
 from src.mwe import Mwe
 from src.trace.trace import Tracer
 from src.interaction.gym import Gym, ProofFinished
+from tests.utils.utils import read_code_from_file
 
 
-def evaluate_all_tactics_of_file_in_gym(
-    file_with_code_path: Path, tracing_res_path: Path
-) -> None:
-    code = ""
-
-    # Open the file using the absolute path
-    file = open(file_with_code_path, "r", encoding="utf-8")
-    code = file.read()
-    file.close()
+def evaluate_all_tactics_of_file_in_gym(file_with_code_path: Path, tracing_res_path: Path) -> None:
+    code = read_code_from_file(file_with_code_path)
 
     code_bytes = code.encode("utf-8")
     theorem_names = get_theorem_names_from_code(code)
@@ -50,13 +44,9 @@ def evaluate_all_tactics_of_file_in_gym(
         logger.debug(f"number of tactics: len({len(tactics)})")
         tactics.sort(key=lambda x: x.pos)
 
-        tactic_terms = list(
-            map(lambda x: (code_bytes[x.pos : x.end_pos]).decode("utf-8"), tactics)
-        )
+        tactic_terms = list(map(lambda x: (code_bytes[x.pos : x.end_pos]).decode("utf-8"), tactics))
         logger.debug(f"tactics: {tactic_terms}")
-        finishing_tactics = [
-            tactic for tactic in tactics if tactic.is_tactic_finishing_proof()
-        ]
+        finishing_tactics = [tactic for tactic in tactics if tactic.is_tactic_finishing_proof()]
         logger.debug(f"number of finishing tactics: {len(finishing_tactics)}")
 
         for tactic in finishing_tactics:
@@ -78,7 +68,8 @@ def evaluate_all_tactics_of_file_in_gym(
                     success += 1
                 else:
                     logger.debug(
-                        f"theorem: {theorem_name} did not execute the following tactic:{(code_bytes[tactic.pos : tactic.end_pos]).decode('utf-8')}"
+                        f"theorem: {theorem_name} did not execute the following \
+                            tactic:{(code_bytes[tactic.pos : tactic.end_pos]).decode('utf-8')}"
                     )
                     logger.debug(f"failed: {state_1}")
                     logger.debug(f" expected previous state: {tactic.state_before}")
@@ -100,7 +91,5 @@ if __name__ == "__main__":
     # tracing_result_path = os.path.join(
     #     script_dir, "../tests/data/tracing_results/Algebra.Basics.Main.ast.json"
     # )
-    tracing_result_path = os.path.join(
-        script_dir, "../execution_env/build/ir/Main.ast.json"
-    )
+    tracing_result_path = os.path.join(script_dir, "../execution_env/build/ir/Main.ast.json")
     evaluate_all_tactics_of_file_in_gym(file_path, tracing_result_path)
