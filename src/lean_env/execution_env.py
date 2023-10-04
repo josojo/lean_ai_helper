@@ -19,7 +19,7 @@ class ExecutionEnv:
         """Create a test environment for the proof."""
 
         # copy the content from common repl dir into the tmp dir
-        if not os.path.exists(self.tmp_dir):
+        if not os.path.exists(self.tmp_dir / "lakefile.lean"):
             logger.debug("Copying the content from submodule repl dir into the tmp dir")
             shutil.copytree(
                 str(Path(__file__).parent.parent.parent.absolute() / "Lean4Repl"),

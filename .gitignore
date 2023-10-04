@@ -3,5 +3,6 @@ __pycache__/
 .vscode/
 .pytest_cache/
 .env
+execution_env_*
 execution_env
 .DS_Store
