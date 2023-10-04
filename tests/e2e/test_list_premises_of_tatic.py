@@ -17,7 +17,9 @@ def test_list_premises_of_tactic() -> None:
         "minFacHelper_0",
     )
     tracer = Tracer(mwe)
-    tracer.load_trace_result(os.path.join(script_dir, "../data/tracing_results/Main.ast.json"))
+    tracer.load_trace_result(
+        os.path.join(script_dir, "../data/tracing_results/Main.ast.json")
+    )
     tactic = tracer.tracing_result.tatics[-5]
 
     premises = tracer.get_premises_from_tactic(tactic)

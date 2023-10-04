@@ -2,22 +2,20 @@ import os
 
 from loguru import logger
 
-from src.mwe import Mwe
 from src.trace.trace import Tracer
-from tests.utils.utils import read_code_from_file
+from tests.utils.utils import initiate_mwe_for_min_fac_helper
 
 
 def test_list_used_def_of_theorem() -> None:
     """Test the example from https://leanprover-community.github.io/mwe.html."""
-    code = read_code_from_file("../data/Mathlib.Meta.NormNum.Prime.lean")
     script_dir = os.path.dirname(os.path.realpath(__file__))
 
-    mwe = Mwe(
-        code,
-        "minFacHelper_0",
-    )
+    mwe = initiate_mwe_for_min_fac_helper()
+
     tracer = Tracer(mwe)
-    tracer.load_trace_result(os.path.join(script_dir, "../data/tracing_results/Main.ast.json"))
+    tracer.load_trace_result(
+        os.path.join(script_dir, "../data/tracing_results/Main.ast.json")
+    )
 
     premises = tracer.get_defintions_used_in_theorem()
     logger.info(f"used premises: {list(map(lambda x: x.full_name, premises))}")

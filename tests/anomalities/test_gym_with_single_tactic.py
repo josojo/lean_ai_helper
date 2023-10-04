@@ -30,7 +30,12 @@ def test_example_1() -> None:
 
     # For some reason the following does not work:
     # But running all tactics one by one works:
-    # {"sid": 0, "cmd": ["replace h : P.toRingHom = Q.toRingHom := FunLike.ext _ _ h", "have h' : (haveI := P; (\u00b7 \u2022 \u00b7) : R \u2192 A \u2192 A) = (haveI := Q; (\u00b7 \u2022 \u00b7) : R \u2192 A \u2192 A) := by\n    funext r a\n    rw [P.smul_def', Q.smul_def', h]", "rcases P with @\u27e8\u27e8P\u27e9\u27e9", "rcases Q with @\u27e8\u27e8Q\u27e9\u27e9"]}
+    # {"sid": 0, "cmd": ["replace h : P.toRingHom = Q.toRingHom := FunLike.ext _ _ h",
+    # "have h' : (haveI := P; (\u00b7 \u2022 \u00b7) : R \u2192 A \u2192 A) =
+    # (haveI := Q; (\u00b7 \u2022 \u00b7) : R \u2192 A \u2192 A) :=
+    # by\n    funext r a\n    rw [P.smul_def', Q.smul_def', h]",
+    # "rcases P with @\u27e8\u27e8P\u27e9\u27e9",
+    # "rcases Q with @\u27e8\u27e8Q\u27e9\u27e9"]}
     # {"sid":0, "cmd":["  congr"]}
     with Gym(mwe, tactic) as (gym, state_0):
         state_1 = gym.run_tacs(state_0, [tactic.get_syntax_of_tactic(code_bytes)])

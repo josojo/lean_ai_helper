@@ -1,6 +1,7 @@
 from loguru import logger
-
 from src.mwe import Mwe
+
+
 from src.trace.trace import Tracer
 from src.interaction.gym import Gym, ProofFinished
 from tests.utils.utils import read_code_from_file

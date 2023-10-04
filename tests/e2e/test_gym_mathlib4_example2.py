@@ -1,16 +1,11 @@
 from src.interaction.gym import Gym, ProofFinished
-from src.mwe import Mwe
-from tests.utils.utils import read_code_from_file
+from tests.utils.utils import initiate_mwe_for_disjoint_to_finset
 
 
 def test_example_1() -> None:
     """Test the example from https://leanprover-community.github.io/mwe.html."""
-    code = read_code_from_file("../data/Mathlib.Data.Set.Finite.lean")
 
-    mwe = Mwe(
-        code,
-        "disjoint_toFinset",
-    )
+    mwe = initiate_mwe_for_disjoint_to_finset()
 
     with Gym(mwe) as (gym, state_0):
         state_1 = gym.run_tac(
