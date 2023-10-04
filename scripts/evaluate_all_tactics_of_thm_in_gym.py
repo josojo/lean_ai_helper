@@ -1,25 +1,18 @@
 import os
-import re
 
-from typing import List
 from pathlib import Path
 from loguru import logger
+from scripts.helpers.helpers import get_objects_for_theorem
 
 from src.interaction.utils import get_theorem_names_from_code
-from src.mwe import Mwe
-from src.trace.trace import Tracer
 from src.interaction.gym import Gym, ProofFinished
+from tests.utils.utils import read_code_from_file
 
 
 def evaluate_all_tactics_of_file_in_gym(
     file_with_code_path: Path, tracing_res_path: Path
 ) -> None:
-    code = ""
-
-    # Open the file using the absolute path
-    file = open(file_with_code_path, "r", encoding="utf-8")
-    code = file.read()
-    file.close()
+    code = read_code_from_file(file_with_code_path)
 
     code_bytes = code.encode("utf-8")
     theorem_names = get_theorem_names_from_code(code)
@@ -29,14 +22,7 @@ def evaluate_all_tactics_of_file_in_gym(
         logger.debug(f"Testing with theorem: {theorem_name}")
         if theorem_name != "algebra_ext":
             continue
-        mwe = Mwe(
-            code,
-            theorem_name,
-        )
-        tracer = Tracer(mwe)
-        tracer.load_trace_result(tracing_res_path)
-        # Get tactics
-        tactics = tracer.get_traced_tactic(tracer.tracing_result.tatics)
+        mwe, tactics = get_objects_for_theorem(theorem_name, code, tracing_res_path)
         if not tactics:
             logger.debug(f"theorem: {theorem_name} has no tactics")
             continue
@@ -54,7 +40,8 @@ def evaluate_all_tactics_of_file_in_gym(
                 success += 1
             else:
                 logger.debug(
-                    f"theorem: {theorem_name} did not execute the following tactic:{[(code_bytes[tactic.pos : tactic.end_pos]).decode('utf-8') for tactic in tactics]}"
+                    f"theorem: {theorem_name} did not execute the following tactic:\
+                {[(code_bytes[tactic.pos : tactic.end_pos]).decode('utf-8') for tactic in tactics]}"
                 )
                 logger.debug(f"failed: {state_1}")
     logger.info(f"out of {checkable_theorems} theorems, {success} succeeded")

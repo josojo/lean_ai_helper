@@ -21,6 +21,8 @@ fmt:
 
 lint:
 	pylint ${PROJECT_ROOT}/
+	pylint tests/
+	pylint scripts/
 
 types:
 	mypy ${PROJECT_ROOT}/ --strict

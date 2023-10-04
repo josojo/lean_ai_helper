@@ -1,23 +1,16 @@
-import pytest
 import os
 
 from loguru import logger
 
 from src.mwe import Mwe
 from src.trace.trace import Tracer
+from tests.utils.utils import read_code_from_file
 
 
 def test_list_premises_of_tactic() -> None:
     """Test the example from https://leanprover-community.github.io/mwe.html."""
-
-    code = ""
+    code = read_code_from_file("../data/Mathlib.Meta.NormNum.Prime.lean")
     script_dir = os.path.dirname(os.path.realpath(__file__))
-    file_path = os.path.join(script_dir, "../data/Mathlib.Meta.NormNum.Prime.lean")
-
-    # Open the file using the absolute path
-    file = open(file_path, "r", encoding="utf-8")
-    code = file.read()
-    file.close()
 
     mwe = Mwe(
         code,
@@ -31,8 +24,8 @@ def test_list_premises_of_tactic() -> None:
 
     premises = tracer.get_premises_from_tactic(tactic)
     code = code.encode("utf-8")
-    tatic_code = (code[tactic.pos : tactic.end_pos]).decode("utf-8")
+    tatic_code = tactic.get_syntax_of_tactic(code)
     logger.info(f"tactic: {tatic_code}")
     logger.info(f"used premises: {list(map(lambda x: x.full_name, premises))}")
-    assert tatic_code == "rcases hp.eq_or_lt with rfl|h"
+    assert tatic_code == "    rcases hp.eq_or_lt with rfl|h"
     assert list(map(lambda x: x.full_name, premises)) == ["LE.le.eq_or_lt"]

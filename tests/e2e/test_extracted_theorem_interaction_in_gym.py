@@ -1,32 +1,20 @@
-import pytest
 import os
 
-from src.mwe import Mwe
-from src.trace.trace import AstContent, Tracer
+from src.trace.trace import Tracer
 from src.interaction.gym import Gym, ProofFinished
+from tests.utils.utils import initiate_mwe_for_min_fac_helper
 
 
 def test_extracted_theorem_interaction_in_gym() -> None:
-    code = ""
-    script_dir = os.path.dirname(os.path.realpath(__file__))
-    file_path = os.path.join(script_dir, "../data/Mathlib.Meta.NormNum.Prime.lean")
+    mwe = initiate_mwe_for_min_fac_helper()
 
-    # Open the file using the absolute path
-    file = open(file_path, "r", encoding="utf-8")
-    code = file.read()
-    file.close()
-
-    mwe = Mwe(
-        code,
-        "minFacHelper_0",
-    )
     tracer = Tracer(mwe)
-
+    script_dir = os.path.dirname(os.path.realpath(__file__))
     tracer.load_trace_result(
         os.path.join(script_dir, "../data/tracing_results/Main.ast.json")
     )
     # Get tactics
-    code_bytes = code.encode("utf-8")
+    code_bytes = mwe.code.encode("utf-8")
     tactics = tracer.get_traced_tactic(tracer.tracing_result.tatics)
 
     # Check tactics in gym

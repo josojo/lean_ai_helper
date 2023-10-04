@@ -1,36 +1,22 @@
-import pytest
 import os
 from loguru import logger
 
 from src.interaction.gym import Gym, ProofFinished
-from src.mwe import Mwe
 from src.trace.trace import Tracer
+from tests.utils.utils import initiate_mwe_for_min_fac_helper
 
 
 def test_example_1() -> None:
     """Test the example from https://leanprover-community.github.io/mwe.html."""
-    code = ""
-    # Get the absolute path to the directory of the current script
+    mwe = initiate_mwe_for_min_fac_helper()
     script_dir = os.path.dirname(os.path.realpath(__file__))
-
-    # Join the script directory with the relative path to the file
-    file_path = os.path.join(script_dir, "../data/Mathlib.Meta.NormNum.Prime.lean")
-
-    # Open the file using the absolute path
-    file = open(file_path, "r", encoding="utf-8")
-    code = file.read()
-    file.close()
-    mwe = Mwe(
-        code,
-        "minFacHelper_0",
-    )
     tracer = Tracer(mwe)
 
     tracer.load_trace_result(
         os.path.join(script_dir, "../data/tracing_results/Main.ast.json")
     )
     # Get tactics
-    code_bytes = code.encode("utf-8")
+    code_bytes = mwe.code.encode("utf-8")
     tactics = tracer.get_traced_tactic(tracer.tracing_result.tatics)
 
     # Check tactics in gym

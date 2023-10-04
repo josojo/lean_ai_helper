@@ -1,25 +1,16 @@
-import pytest
 import os
 from loguru import logger
 
 from src.interaction.gym import Gym, ProofFinished
 from src.mwe import Mwe
 from src.trace.trace import Tracer
+from tests.utils.utils import read_code_from_file
 
 
 def test_example_1() -> None:
     """Test the example from https://leanprover-community.github.io/mwe.html."""
-    code = ""
-    # Get the absolute path to the directory of the current script
+    code = read_code_from_file("../data/Mathlib.Algebra.Algebra.Basic.lean")
     script_dir = os.path.dirname(os.path.realpath(__file__))
-
-    # Join the script directory with the relative path to the file
-    file_path = os.path.join(script_dir, "../data/Mathlib.Algebra.Algebra.Basic.lean")
-
-    # Open the file using the absolute path
-    file = open(file_path, "r", encoding="utf-8")
-    code = file.read()
-    file.close()
     mwe = Mwe(
         code,
         "algebra_ext",
@@ -39,7 +30,12 @@ def test_example_1() -> None:
 
     # For some reason the following does not work:
     # But running all tactics one by one works:
-    # {"sid": 0, "cmd": ["replace h : P.toRingHom = Q.toRingHom := FunLike.ext _ _ h", "have h' : (haveI := P; (\u00b7 \u2022 \u00b7) : R \u2192 A \u2192 A) = (haveI := Q; (\u00b7 \u2022 \u00b7) : R \u2192 A \u2192 A) := by\n    funext r a\n    rw [P.smul_def', Q.smul_def', h]", "rcases P with @\u27e8\u27e8P\u27e9\u27e9", "rcases Q with @\u27e8\u27e8Q\u27e9\u27e9"]}
+    # {"sid": 0, "cmd": ["replace h : P.toRingHom = Q.toRingHom := FunLike.ext _ _ h",
+    # "have h' : (haveI := P; (\u00b7 \u2022 \u00b7) : R \u2192 A \u2192 A) =
+    # (haveI := Q; (\u00b7 \u2022 \u00b7) : R \u2192 A \u2192 A) :=
+    # by\n    funext r a\n    rw [P.smul_def', Q.smul_def', h]",
+    # "rcases P with @\u27e8\u27e8P\u27e9\u27e9",
+    # "rcases Q with @\u27e8\u27e8Q\u27e9\u27e9"]}
     # {"sid":0, "cmd":["  congr"]}
     with Gym(mwe, tactic) as (gym, state_0):
         state_1 = gym.run_tacs(state_0, [tactic.get_syntax_of_tactic(code_bytes)])

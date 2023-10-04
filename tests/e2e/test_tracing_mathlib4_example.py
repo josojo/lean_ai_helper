@@ -1,23 +1,13 @@
-import pytest
-import os
-
 from loguru import logger
 
 from src.mwe import Mwe
 from src.trace.trace import AstContent, PosEncoding, Tracer
+from tests.utils.utils import read_code_from_file
 
 
 def test_tracing_file() -> None:
     """Test the example from https://leanprover-community.github.io/mwe.html."""
-
-    code = ""
-    script_dir = os.path.dirname(os.path.realpath(__file__))
-    file_path = os.path.join(script_dir, "../data/Mathlib.Meta.NormNum.Prime.lean")
-
-    # Open the file using the absolute path
-    file = open(file_path, "r", encoding="utf-8")
-    code = file.read()
-    file.close()
+    code = read_code_from_file("../data/Mathlib.Meta.NormNum.Prime.lean")
 
     mwe = Mwe(
         code,
