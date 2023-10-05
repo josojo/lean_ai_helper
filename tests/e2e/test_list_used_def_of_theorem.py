@@ -1,6 +1,6 @@
 import os
 
-from loguru import logger
+from src.logger_config import logger
 
 from src.trace.trace import Tracer
 from tests.utils.utils import initiate_mwe_for_min_fac_helper

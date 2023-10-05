@@ -10,3 +10,5 @@ if "VERBOSE" in os.environ or "DEBUG" in os.environ:
     logger.add(sys.stderr, level="DEBUG")
 else:
     logger.add(sys.stderr, level="INFO")
+
+__all__ = ["logger"]

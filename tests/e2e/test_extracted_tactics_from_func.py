@@ -1,4 +1,4 @@
-from loguru import logger
+from src.logger_config import logger
 from src.mwe import Mwe
 
 

@@ -8,8 +8,8 @@ import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Union, List, Optional, Tuple, Dict
-from loguru import logger
 
+from src.logger_config import logger
 from src.lean_env.execution_env import ExecutionEnv
 from src.mwe import Mwe
 from src.interaction.utils import format_tactic_for_repl
