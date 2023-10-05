@@ -14,3 +14,9 @@ def test_extracted_theorem_interaction_in_gym() -> None:
 [Semiring A] (P Q : Algebra R A)\n    (h : ∀ r : R, \
 (haveI := P; algebraMap R A r) = haveI := Q; algebraMap R A r) :\n    P = Q :="
     )
+    mwe = Mwe(code, "mul_smul_comm")
+    assert (
+        mwe.code[mwe.theorem_start : mwe.proof_start]
+        == "protected theorem mul_smul_comm (s : R) (x y : A) : x * s • y \
+= s • (x * y) :="
+    )

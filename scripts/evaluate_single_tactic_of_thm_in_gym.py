@@ -10,9 +10,13 @@ from loguru import logger
 import ray
 
 from scripts.helpers.helpers import get_objects_for_theorem
+from scripts.prepareScripts.rewrite_in_tactic_style import (
+    rewrite_all_proofs_in_tactic_style,
+)
+from scripts.remove_lean_comments import remove_comments
 from src.interaction.utils import get_theorem_names_from_code
 
-from src.mwe import Mwe
+from src.mwe import Mwe, UnusualTheoremFormatError
 from src.trace.trace import Tracer
 from src.interaction.gym import Gym, ProofFinished
 from tests.utils.utils import read_code_from_file
@@ -29,15 +33,24 @@ def evaluate_all_tactics_of_file_in_gym(
 
     code_bytes = code.encode("utf-8")
     theorem_names = get_theorem_names_from_code(code)
+
+    if len(theorem_names) == 0:
+        logger.debug(f"file: {file_with_code_path} has no theorems")
+        return 0, 0
     # trace only once the first theorem to save the updated tracing data
     if with_tracing:
-        Tracer(
-            Mwe(
-                code,
-                theorem_names[0],
-            ),
-            temp_dir,
-        ).trace_mwe()
+        try:
+            Tracer(
+                Mwe(
+                    code,
+                    theorem_names[0],
+                ),
+                temp_dir,
+            ).trace_mwe()
+        except UnusualTheoremFormatError as err:
+            logger.debug(f"failed to get objects for theorem: {theorem_names[0]}")
+            logger.debug(err)
+            return 0, 0
 
     tactic_counter = 0
     success = 0
@@ -45,7 +58,12 @@ def evaluate_all_tactics_of_file_in_gym(
         logger.debug(f"Testing with theorem: {theorem_name}")
         # if theorem_name != "image_coe_closedBall":
         #     continue
-        mwe, tactics = get_objects_for_theorem(theorem_name, code, tracing_res_path)
+        try:
+            mwe, tactics = get_objects_for_theorem(theorem_name, code, tracing_res_path)
+        except UnusualTheoremFormatError as err:
+            logger.debug(f"failed to get objects for theorem: {theorem_name}")
+            logger.debug(err)
+            continue
         logger.debug(f"number of tactics: len({len(tactics)})")
         tactics.sort(key=lambda x: x.pos)
 
@@ -99,11 +117,27 @@ if __name__ == "__main__":
 
     results = []
     futures = {}
-    files_to_investigate = [
-        "../tests/data/Mathlib.AlgebraicTopology.SimplexCategory_rewrite.lean",
-        "../tests/data/Mathlib.Analysis.Complex.UpperHalfPlane.Metric_rewrite.lean",
-        "../tests/data/Mathlib.Algebra.Algebra.Basic_rewrite.lean",
-    ]
+    path_to_mathlib4 = Path("/Users/josojo/coding/ai/lean/mathlib4/Mathlib/")
+    all_files_in_path = []
+    for root, dirs, files in os.walk(path_to_mathlib4):
+        for file in files:
+            all_files_in_path.append(os.path.join(root, file))
+    for file in all_files_in_path:
+        file_path_new = file.replace("mathlib4", "mathlib4_new")
+        rewrite_all_proofs_in_tactic_style(file, file_path_new)
+        remove_comments(file_path_new)
+
+    files_to_investigate = []
+    path_to_mathlib4_new = Path("/Users/josojo/coding/ai/lean/mathlib4_new/Mathlib/")
+    for root, dirs, files in os.walk(path_to_mathlib4):
+        for file in files:
+            files_to_investigate.append(os.path.join(root, file))
+
+    files_to_investigate = files_to_investigate[100:500]
+    #     "../tests/data/Mathlib.AlgebraicTopology.SimplexCategory_rewrite.lean",
+    #     "../tests/data/Mathlib.Analysis.Complex.UpperHalfPlane.Metric_rewrite.lean",
+    #     "../tests/data/Mathlib.Algebra.Algebra.Basic_rewrite.lean",
+    # ]
     script_dir = os.path.dirname(os.path.realpath(__file__))
 
     for file_path in files_to_investigate:
@@ -127,6 +161,7 @@ if __name__ == "__main__":
         env = execution_envs_queue.popleft()
         tmp_dir = Path(os.path.normpath(os.path.join(script_dir, f"../{env}/")))
         tracing_result_path = os.path.join(tmp_dir, "build/ir/Main.ast.json")
+        logger.info("Testing with file: " + file_path)
         future = evaluate_all_tactics_of_file_in_gym.remote(
             file_path, tracing_result_path, True, tmp_dir
         )

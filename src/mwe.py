@@ -15,6 +15,10 @@ def all_brackets_closed(code: str) -> bool:
     return True
 
 
+class UnusualTheoremFormatError(Exception):
+    pass
+
+
 def parse_code(code: str, name: str) -> List[int]:
     """
     This function parses the code to find the start and end positions of the theorem and its proof.
@@ -27,13 +31,22 @@ def parse_code(code: str, name: str) -> List[int]:
         list: A list containing the start position of the theorem,
         the start position of the proof, and the end position of the proof.
     """
-
-    theorem_pattern = re.compile(r"\n.*theorem " + re.escape(name))
+    theorem_pattern = re.compile(
+        r"\n(?:protected |private |nonrec )?theorem " + re.escape(name)
+    )
     match = theorem_pattern.search(code)
     if match is None:
         raise ValueError(f"Theorem {name} not found in code.")
     theorem_start = match.start() + 1
     proof_start = code.find(":=", theorem_start) + 2
+    theorem_code = code[theorem_start:proof_start].split("\n")
+    for i, line in enumerate(theorem_code):
+        if i == 0:
+            continue
+        if len(line.lstrip()) + 2 >= len(line):
+            raise UnusualTheoremFormatError(
+                f"Theorem {name} is not according to the standard format with =:"
+            )
     while not all_brackets_closed(code[theorem_start:proof_start]):
         proof_start = code.find(":=", proof_start) + 2
     lines = code[proof_start:].split("\n")

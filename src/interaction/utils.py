@@ -6,7 +6,9 @@ def get_theorem_names_from_code(code: str) -> List[str]:
     theorem_names = []
     lines = code.split("\n")
     for line in lines:
-        match = re.search(r"\btheorem\b\s+(\w+)", line)
+        match = re.search(
+            r"^(?:protected |private |nonrec |)?\btheorem\b\s+(\w+)", line
+        )
         if match:
             theorem_names.append(match.group(1))
     return theorem_names
