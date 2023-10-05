@@ -9,7 +9,7 @@ from tests.utils.utils import read_code_from_file
 
 def test_list_premises_of_tactic() -> None:
     """Test the example from https://leanprover-community.github.io/mwe.html."""
-    code = read_code_from_file("../data/Mathlib.Meta.NormNum.Prime.lean")
+    code = read_code_from_file("./tests/data/Mathlib.Meta.NormNum.Prime.lean")
     script_dir = os.path.dirname(os.path.realpath(__file__))
 
     mwe = Mwe(

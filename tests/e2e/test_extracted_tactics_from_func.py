@@ -8,7 +8,7 @@ from tests.utils.utils import read_code_from_file
 
 
 def test_extracted_theorem_interaction_in_gym() -> None:
-    code = read_code_from_file("../data/Mathlib.Data.Set.Finite.lean")
+    code = read_code_from_file("./tests/data/Mathlib.Data.Set.Finite.lean")
 
     mwe = Mwe(
         code,
