@@ -9,10 +9,10 @@ from collections import deque
 import ray
 
 from scripts.helpers.helpers import get_objects_for_theorem
-from scripts.prepareScripts.rewrite_in_tactic_style import (
+from src.utils.lean_code_modifier import (
     rewrite_all_proofs_in_tactic_style,
 )
-from scripts.remove_lean_comments import remove_comments
+from src.utils.lean_code_modifier import remove_comments_from_lean_file
 
 from src.logger_config import logger
 from src.interaction.utils import get_theorem_names_from_code
@@ -127,7 +127,7 @@ if __name__ == "__main__":
     for file in all_files_in_path:
         file_path_new = file.replace("mathlib4", "mathlib4_new")
         rewrite_all_proofs_in_tactic_style(file, file_path_new)
-        remove_comments(file_path_new)
+        remove_comments_from_lean_file(file_path_new)
 
     files_to_investigate = []
     path_to_mathlib4_new = Path("/Users/josojo/coding/ai/lean/mathlib4_new/Mathlib/")
