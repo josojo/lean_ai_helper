@@ -3,7 +3,7 @@ from tests.utils.utils import read_code_from_file
 
 
 def test_extracted_theorem_interaction_in_gym() -> None:
-    code = read_code_from_file("../data/Mathlib.Algebra.Algebra.Basic.lean")
+    code = read_code_from_file("./tests/data/Mathlib.Algebra.Algebra.Basic.lean")
     mwe = Mwe(
         code,
         "algebra_ext",
