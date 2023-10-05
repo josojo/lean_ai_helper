@@ -11,7 +11,7 @@ from tests.utils.utils import read_code_from_file
 def rewrite_all_proofs_in_tactic_style(
     file_with_code_path: Path, file_for_writing_result: Path
 ) -> None:
-    logger.info(f"Testing with file: {file_with_code_path}")
+    logger.debug(f"Testing with file: {file_with_code_path}")
     code = read_code_from_file(file_with_code_path)
 
     theorem_names = get_theorem_names_from_code(code)
@@ -41,10 +41,10 @@ if __name__ == "__main__":
     script_dir = os.path.dirname(os.path.realpath(__file__))
     file_path = os.path.join(
         script_dir,
-        "../../tests/data/Mathlib.Order.Countable.lean",
+        "../../tests/data/anomalie.2.lean",
     )
     file_path_new = os.path.join(
         script_dir,
-        "../../tests/data/Mathlib.Order.Countable_rewrite.lean",
+        "../../tests/data/anomalie.2_rewrite.lean",
     )
     rewrite_all_proofs_in_tactic_style(file_path, file_path_new)

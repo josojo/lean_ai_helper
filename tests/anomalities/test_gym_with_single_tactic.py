@@ -26,7 +26,7 @@ def test_example_1() -> None:
 
     # Check tactics in gym
     tactic = tactics[-1]
-    logger.info(f"tactic: {tactic.get_syntax_of_tactic(code_bytes)}")
+    logger.debug(f"tactic: {tactic.get_syntax_of_tactic(code_bytes)}")
 
     # For some reason the following does not work:
     # But running all tactics one by one works:

@@ -21,7 +21,7 @@ def test_list_premises_of_tactic() -> None:
         os.path.join(script_dir, "../data/tracing_results/Algebra.Basics.Main.ast.json")
     )
     tactics = tracer.get_traced_tactic(tracer.tracing_result.tatics)
-    logger.info(f"tactics: {tactics}")
+    logger.debug(f"tactics: {tactics}")
     tactic = tactics[-2]
     premises = tracer.get_premises_from_tactic(tactic)
     code = code.encode("utf-8")
