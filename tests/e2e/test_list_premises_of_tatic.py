@@ -25,7 +25,7 @@ def test_list_premises_of_tactic() -> None:
     premises = tracer.get_premises_from_tactic(tactic)
     code = code.encode("utf-8")
     tatic_code = tactic.get_syntax_of_tactic(code)
-    logger.info(f"tactic: {tatic_code}")
-    logger.info(f"used premises: {list(map(lambda x: x.full_name, premises))}")
+    logger.debug(f"tactic: {tatic_code}")
+    logger.debug(f"used premises: {list(map(lambda x: x.full_name, premises))}")
     assert tatic_code == "    rcases hp.eq_or_lt with rfl|h"
     assert list(map(lambda x: x.full_name, premises)) == ["LE.le.eq_or_lt"]

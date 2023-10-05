@@ -28,7 +28,7 @@ def test_tracing_file() -> None:
     premise = tracer.tracing_result.premises[-1]
     assert premise.mod_name == "Main"
     assert premise.full_name == "Mathlib.Meta.NormNum.minFacHelper_0"
-    logger.info(f"premise: {premise.pos.line}")
+    logger.debug(f"premise: {premise.pos.line}")
     assert premise.pos == PosEncoding(line=35, column=8)
     assert premise.end_pos == PosEncoding(line=35, column=22)
     assert premise.def_pos is None

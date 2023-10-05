@@ -21,7 +21,7 @@ def test_example_1() -> None:
 
     # Check tactics in gym
     tactic = tactics[-1]
-    logger.info(
+    logger.debug(
         f"tactic: {[(code_bytes[tactic.pos : tactic.end_pos]).decode('utf-8')]}"
     )
     with Gym(mwe, tactic) as (gym, state_0):

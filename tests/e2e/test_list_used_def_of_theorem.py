@@ -18,7 +18,7 @@ def test_list_used_def_of_theorem() -> None:
     )
 
     premises = tracer.get_defintions_used_in_theorem()
-    logger.info(f"used premises: {list(map(lambda x: x.full_name, premises))}")
+    logger.debug(f"used premises: {list(map(lambda x: x.full_name, premises))}")
 
     assert list(map(lambda x: x.full_name, premises)) == [
         "Nat",

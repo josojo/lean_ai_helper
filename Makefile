@@ -21,7 +21,8 @@ fmt:
 
 lint:
 	pylint ${PROJECT_ROOT}/
-	pylint tests/
+	pylint tests/unit
+	pylint tests/e2e
 	pylint scripts/
 
 types:

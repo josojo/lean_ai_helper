@@ -90,17 +90,17 @@ def evaluate_all_tactics_of_file_in_gym(
                 if isinstance(state_1, ProofFinished):
                     success += 1
                 else:
-                    logger.debug(
+                    logger.info(
                         f"theorem: {theorem_name} did not execute the following \
                             tactic:{(code_bytes[tactic.pos : tactic.end_pos]).decode('utf-8')}"
                     )
-                    logger.debug(f"failed: {state_1}")
+                    logger.info(f"failed: {state_1}")
                     logger.debug(f" expected previous state: {tactic.state_before}")
                     logger.debug(f" expected next state: {tactic.state_after}")
                     break
-        if success < tactic_counter:
-            logger.info(f"out of {tactic_counter} theorems, {success} succeeded")
-            break
+        # if success < tactic_counter:
+        #     logger.info(f"out of {tactic_counter} theorems, {success} succeeded")
+        #     break
 
     logger.info(f"out of {tactic_counter} theorems, {success} succeeded")
     return success, tactic_counter
@@ -129,11 +129,11 @@ if __name__ == "__main__":
 
     files_to_investigate = []
     path_to_mathlib4_new = Path("/Users/josojo/coding/ai/lean/mathlib4_new/Mathlib/")
-    for root, dirs, files in os.walk(path_to_mathlib4):
+    for root, dirs, files in os.walk(path_to_mathlib4_new):
         for file in files:
             files_to_investigate.append(os.path.join(root, file))
 
-    files_to_investigate = files_to_investigate[100:500]
+    files_to_investigate = files_to_investigate[200:210]
     #     "../tests/data/Mathlib.AlgebraicTopology.SimplexCategory_rewrite.lean",
     #     "../tests/data/Mathlib.Analysis.Complex.UpperHalfPlane.Metric_rewrite.lean",
     #     "../tests/data/Mathlib.Algebra.Algebra.Basic_rewrite.lean",
@@ -154,14 +154,18 @@ if __name__ == "__main__":
 
             for done_id in ready_ids:
                 # Retrieve the result, free up the folder, and remove from tracking dict
-                results.append(ray.get(done_id))
+                result = ray.get(done_id)
+                results.append(result)
+                i, j = result
+                # if i < j:
+                #     raise ValueError("found unsuccessful tactic")
                 execution_envs_queue.append(futures.pop(done_id))
 
         # Start a task with an available folder
         env = execution_envs_queue.popleft()
         tmp_dir = Path(os.path.normpath(os.path.join(script_dir, f"../{env}/")))
         tracing_result_path = os.path.join(tmp_dir, "build/ir/Main.ast.json")
-        logger.info("Testing with file: " + file_path)
+        logger.debug("Testing with file: " + file_path)
         future = evaluate_all_tactics_of_file_in_gym.remote(
             file_path, tracing_result_path, True, tmp_dir
         )
@@ -169,6 +173,12 @@ if __name__ == "__main__":
 
     # Wait for all remaining tasks to finish
     results.extend(ray.get(list(futures.keys())))
+    SUCCESS_CNT = 0
+    EXECUTION_CNT = 0
     for result in results:
+        i, j = result
+        SUCCESS_CNT += i
+        EXECUTION_CNT += j
         print(result)
+    logger.info(f"out of {EXECUTION_CNT} theorems, {SUCCESS_CNT} succeeded")
     ray.shutdown()
