@@ -5,7 +5,6 @@ import os
 from ast import Tuple
 from pathlib import Path
 from collections import deque
-from loguru import logger
 
 import ray
 
@@ -14,11 +13,13 @@ from scripts.prepareScripts.rewrite_in_tactic_style import (
     rewrite_all_proofs_in_tactic_style,
 )
 from scripts.remove_lean_comments import remove_comments
-from src.interaction.utils import get_theorem_names_from_code
 
+from src.logger_config import logger
+from src.interaction.utils import get_theorem_names_from_code
 from src.mwe import Mwe, UnusualTheoremFormatError
 from src.trace.trace import Tracer
 from src.interaction.gym import Gym, ProofFinished
+
 from tests.utils.utils import read_code_from_file
 
 
@@ -90,6 +91,7 @@ def evaluate_all_tactics_of_file_in_gym(
                 if isinstance(state_1, ProofFinished):
                     success += 1
                 else:
+                    logger.info(f"for the file: {file_with_code_path}")
                     logger.info(
                         f"theorem: {theorem_name} did not execute the following \
                             tactic:{(code_bytes[tactic.pos : tactic.end_pos]).decode('utf-8')}"
@@ -133,7 +135,7 @@ if __name__ == "__main__":
         for file in files:
             files_to_investigate.append(os.path.join(root, file))
 
-    files_to_investigate = files_to_investigate[200:210]
+    files_to_investigate = files_to_investigate[214:215]
     #     "../tests/data/Mathlib.AlgebraicTopology.SimplexCategory_rewrite.lean",
     #     "../tests/data/Mathlib.Analysis.Complex.UpperHalfPlane.Metric_rewrite.lean",
     #     "../tests/data/Mathlib.Algebra.Algebra.Basic_rewrite.lean",

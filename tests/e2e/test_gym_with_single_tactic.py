@@ -1,5 +1,5 @@
 import os
-from loguru import logger
+from src.logger_config import logger
 
 from src.interaction.gym import Gym, ProofFinished
 from src.trace.trace import Tracer

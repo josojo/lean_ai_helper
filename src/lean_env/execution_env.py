@@ -3,7 +3,7 @@ import shutil
 import subprocess
 from typing import Optional
 from pathlib import Path
-from loguru import logger
+from src.logger_config import logger
 
 
 class ExecutionEnv:

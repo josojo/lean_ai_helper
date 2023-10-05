@@ -1,9 +1,9 @@
 import os
 
 from pathlib import Path
-from loguru import logger
 from scripts.helpers.helpers import get_objects_for_theorem
 
+from src.logger_config import logger
 from src.interaction.utils import get_theorem_names_from_code
 from src.interaction.gym import Gym, ProofFinished
 from tests.utils.utils import read_code_from_file
