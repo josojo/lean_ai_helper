@@ -5,11 +5,11 @@ from tests.utils.utils import read_code_from_file
 
 
 def test_extracted_theorem_interaction_in_gym() -> None:
-    code = read_code_from_file("../data/anomalie.2_rewrite.lean")
+    code = read_code_from_file("../data/anomalie.3_rewrite.lean")
 
     mwe = Mwe(
         code,
-        "exists_not_acc_lt_of_not_acc",
+        "AntisymmRel.symm",
     )
 
     tracer = Tracer(mwe)
