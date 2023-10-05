@@ -207,7 +207,6 @@ class Gym:
             modified_code = (
                 "import Lean4Repl\n\n"
                 + code_before_theorem
-                + "set_option maxHeartbeats 0 in\n"
                 + code_thereom
                 + code_proof
                 + self.mwe.code[self.mwe.proof_end :]
