@@ -50,9 +50,9 @@ def evaluate_all_tactics_of_file_in_gym(
 if __name__ == "__main__":
     script_dir = os.path.dirname(os.path.realpath(__file__))
     file_path = os.path.join(
-        script_dir, "../tests/data/Mathlib.Algebra.Algebra.Basic.lean"
+        script_dir, "../../tests/data/Mathlib.Algebra.Algebra.Basic.lean"
     )
     tracing_result_path = os.path.join(
-        script_dir, "../tests/data/tracing_results/Algebra.Basics.Main.ast.json"
+        script_dir, "../../tests/data/tracing_results/Algebra.Basics.Main.ast.json"
     )
     evaluate_all_tactics_of_file_in_gym(file_path, tracing_result_path)
