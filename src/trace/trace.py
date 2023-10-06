@@ -114,6 +114,7 @@ class Tracer:
         """Initialize Tracer."""
         self.mwe = mwe
         self.execution_env = ExecutionEnv(tmp_dir)
+        self.execution_env.create_env()
         self.execution_env.write_main_file(mwe.code)
         self.tracing_result: Optional[AstContent] = None
 
