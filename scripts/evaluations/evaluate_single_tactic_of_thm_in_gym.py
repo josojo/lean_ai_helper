@@ -135,7 +135,7 @@ if __name__ == "__main__":
         for file in files:
             files_to_investigate.append(os.path.join(root, file))
 
-    files_to_investigate = files_to_investigate[214:215]
+    files_to_investigate = files_to_investigate[215:218]
     #     "../tests/data/Mathlib.AlgebraicTopology.SimplexCategory_rewrite.lean",
     #     "../tests/data/Mathlib.Analysis.Complex.UpperHalfPlane.Metric_rewrite.lean",
     #     "../tests/data/Mathlib.Algebra.Algebra.Basic_rewrite.lean",
@@ -165,7 +165,7 @@ if __name__ == "__main__":
 
         # Start a task with an available folder
         env = execution_envs_queue.popleft()
-        tmp_dir = Path(os.path.normpath(os.path.join(script_dir, f"../{env}/")))
+        tmp_dir = Path(os.path.normpath(os.path.join(script_dir, f"../../{env}/")))
         tracing_result_path = os.path.join(tmp_dir, "build/ir/Main.ast.json")
         logger.debug("Testing with file: " + file_path)
         future = evaluate_all_tactics_of_file_in_gym.remote(
