@@ -22,8 +22,8 @@ class UnusualTheoremFormatError(Exception):
 def get_theorem_positions(code: str, name: str, thm_iteration: int = 0) -> List[int]:
     """
     This function parses the code to find the start and end positions of the theorem and its proof.
-    Since the name is not a unique identifier, one can also hand in an thm_iteration to specify which theorem
-    with the same name should be parsed.
+    Since the name is not a unique identifier, one can also hand in an thm_iteration
+    to specify which theorem with the same name should be parsed.
 
     Args:
         code (str): The code to be parsed.
@@ -39,11 +39,12 @@ def get_theorem_positions(code: str, name: str, thm_iteration: int = 0) -> List[
     )
     match = theorem_pattern.search(code)
     for _ in range(thm_iteration):
-        match = theorem_pattern.search(code, match.end())
         if match is None:
             raise ValueError(
                 f"Theorem {name} iteration {thm_iteration} not found in code."
             )
+        match = theorem_pattern.search(code, match.end())
+
     if match is None:
         raise ValueError(f"Theorem {name} not found in code.")
     theorem_start = match.start() + 1
