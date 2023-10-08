@@ -6,11 +6,12 @@ from src.trace.trace import TracedTacticState, Tracer
 
 
 def get_objects_for_theorem(
-    theorem_name: str, code: str, tracing_res_path: Path
+    theorem_name: str, code: str, tracing_res_path: Path, iteration: int = 0
 ) -> Tuple(Mwe, List[TracedTacticState]):
     mwe = Mwe(
         code,
         theorem_name,
+        thm_iteration=iteration,
     )
     tracer = Tracer(mwe)
     tracer.load_trace_result(tracing_res_path)

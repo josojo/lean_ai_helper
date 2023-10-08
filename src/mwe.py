@@ -19,13 +19,16 @@ class UnusualTheoremFormatError(Exception):
     pass
 
 
-def parse_code(code: str, name: str) -> List[int]:
+def get_theorem_positions(code: str, name: str, thm_iteration: int = 0) -> List[int]:
     """
     This function parses the code to find the start and end positions of the theorem and its proof.
+    Since the name is not a unique identifier, one can also hand in an thm_iteration
+    to specify which theorem with the same name should be parsed.
 
     Args:
         code (str): The code to be parsed.
         name (str): The name of the theorem.
+        thm_iteration (int, optional): The iteration of the theorem. Defaults to 0.
 
     Returns:
         list: A list containing the start position of the theorem,
@@ -35,6 +38,13 @@ def parse_code(code: str, name: str) -> List[int]:
         r"\n(?:protected |private |nonrec )?theorem " + re.escape(name)
     )
     match = theorem_pattern.search(code)
+    for _ in range(thm_iteration):
+        if match is None:
+            raise ValueError(
+                f"Theorem {name} iteration {thm_iteration} not found in code."
+            )
+        match = theorem_pattern.search(code, match.end())
+
     if match is None:
         raise ValueError(f"Theorem {name} not found in code.")
     theorem_start = match.start() + 1
@@ -73,10 +83,13 @@ class Mwe:
         self,
         code: str,
         name: str,
+        thm_iteration: int = 0,
     ):
         self.code = code
         self.name = name
-        [self.theorem_start, self.proof_start, self.proof_end] = parse_code(code, name)
+        [self.theorem_start, self.proof_start, self.proof_end] = get_theorem_positions(
+            code, name, thm_iteration
+        )
 
     def rewrite_to_tactic_style(self) -> None:
         """Rewrite the code to tactic style."""
