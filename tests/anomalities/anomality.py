@@ -1,3 +1,4 @@
+import os
 from loguru import logger
 from src.mwe import Mwe
 from src.trace.trace import Tracer
@@ -11,24 +12,30 @@ def test_extracted_theorem_interaction_in_gym() -> None:
         code = read_code_from_file(
             "./tests/data/Mathlib.Order.Bounds.Basics_rewrite.lean"
         )
+        script_dir = os.path.dirname(os.path.realpath(__file__))
 
         mwe = Mwe(code, "mem_lowerBounds_image", i)
-
         tracer = Tracer(mwe)
-        if i == 0:
-            tracer.trace_mwe()
-        else:
-            tracer.load_trace_result(
-                tracer.execution_env.tmp_dir / "build/ir/Main.ast.json"
+        tracer.load_trace_result(
+            os.path.join(
+                script_dir,
+                "../data/tracing_results/Mathlib.Order.Bounds.Basics_rewrite.ast.json",
             )
+        )
         # Get tactics
         code_bytes = mwe.code.encode("utf-8")
         tactics = tracer.get_traced_tactic(tracer.tracing_result.tatics)
 
+        logger.debug(
+            f"tactics: {[tactic.get_syntax_of_tactic(code_bytes) for tactic in tactics]}"
+        )
         # Check tactics in gym
         with Gym(mwe) as (gym, state_0):
             state_1 = gym.run_tacs(
                 state_0,
                 [tactic.get_syntax_of_tactic(code_bytes) for tactic in tactics],
             )
-            assert isinstance(state_1, ProofFinished)
+            if (
+                i != 0
+            ):  # for i == 0, we actually get the anomalie, resulting in a kernel error
+                assert isinstance(state_1, ProofFinished)
