@@ -38,10 +38,6 @@ def generate_training_data(
     )
     tracing_result_path = Path(os.path.join(tmp_dir, "build/ir/Main.ast.json"))
     code = read_code_from_file(file_with_code_path)
-    project_dir = os.path.normpath(
-        os.path.join(os.path.dirname(os.path.realpath(__file__)), "/../../")
-    )
-    relative_file_with_code = os.path.relpath(project_dir, file_with_code_path)
 
     code_bytes = code.encode("utf-8")
     theorem_names = get_theorem_names_from_code(code)
@@ -83,7 +79,7 @@ def generate_training_data(
         tracer.load_trace_result(tracing_result_path)
         json_data = {
             "theorem_name": theorem_name,
-            "file_path": str(relative_file_with_code),
+            "file_path": str(file_with_code_path),
             "tactics": [
                 {
                     "syntax": tactic.get_syntax_of_tactic(code_bytes),

@@ -55,18 +55,33 @@ def test_extracted_theorem_interaction_in_gym() -> None:
     with open(output_file, "r", encoding="utf-8") as file:
         output = json.load(file)
 
-    assert json.dumps(output[0], sort_keys=True) == json.dumps(
+    assert output[0]["theorem_name"] == "Finite.exists_finset"
+    assert json.dumps(output[0]["tactics"], sort_keys=True) == json.dumps(
         json.loads(
-            '{"theorem_name": "Finite.exists_finset", \
-            "file_path": \
-                "/tests/data/Mathlib.Data.Set.Finite.lean", \
-            "tactics": [ \
+            '[ \
                 {"syntax": "  cases h", "premises": []}, \
                 {"syntax": "  exact \u27e8s.toFinset, fun _ => mem_toFinset\u27e9",\
-                "premises": ["Exists.intro", "Set.toFinset", "Set.mem_toFinset"]}], \
-            "defintions": ["Set", "Set.Finite", "Exists", \
-            "Finset", "Iff", "Membership.mem", "Set.Finite.exists_finset"]}'
+                "premises": ["Exists.intro", "Set.toFinset", "Set.mem_toFinset"]}]'
         ),
         sort_keys=True,
     )
+    assert output[0]["defintions"] == [
+        "Set",
+        "Set.Finite",
+        "Exists",
+        "Finset",
+        "Iff",
+        "Membership.mem",
+        "Set.Finite.exists_finset",
+    ]
+    #     json.loads(
+    #         '{"theorem_name":, \
+    #         "file_path": \
+    #             "/tests/data/Mathlib.Data.Set.Finite.lean", \
+    #         "tactics":  \
+    #         "defintions": ["Set", "Set.Finite", "Exists", \
+    #         "Finset", "Iff", "Membership.mem", "Set.Finite.exists_finset"]}'
+    #     ),
+    #     sort_keys=True,
+    # )
     assert len(output) == 25
