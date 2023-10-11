@@ -2,17 +2,19 @@
 # script to generate the file with the tactic style code
 
 import os
+import sys
 from ast import Tuple
 from pathlib import Path
-from collections import deque
+from typing import Optional
 
 import ray
-
-from scripts.helpers.helpers import get_objects_for_theorem
-from src.utils.lean_code_modifier import (
-    rewrite_all_proofs_in_tactic_style,
+from src.generate.training_data import (
+    get_all_files_from_dictionary,
+    prepare_lean_files_by_rewriting_and_removing_comments,
 )
-from src.utils.lean_code_modifier import remove_comments_from_lean_file
+from src.lean_env.setup import ParallelExecutor
+
+from src.utils.reader import get_objects_for_theorem
 
 from src.logger_config import logger
 from src.interaction.utils import get_theorem_names_from_code
@@ -26,10 +28,18 @@ from tests.utils.utils import read_code_from_file
 @ray.remote
 def evaluate_all_tactics_of_file_in_gym(
     file_with_code_path: Path,
-    tracing_res_path: Path,
-    with_tracing: bool,
-    temp_dir: Path,
+    environment: Path,
+    _output_file: Optional[Path] = None,
 ) -> Tuple(int, int):
+    tmp_dir = Path(
+        os.path.normpath(
+            os.path.join(
+                os.path.dirname(os.path.realpath(__file__)), f"../../{environment}/"
+            )
+        )
+    )
+    tracing_result_path = os.path.join(tmp_dir, "build/ir/Main.ast.json")
+    logger.debug("Testing with file: " + str(file_with_code_path))
     code = read_code_from_file(file_with_code_path)
 
     code_bytes = code.encode("utf-8")
@@ -38,29 +48,40 @@ def evaluate_all_tactics_of_file_in_gym(
     if len(theorem_names) == 0:
         logger.debug(f"file: {file_with_code_path} has no theorems")
         return 0, 0
+
+    ## We sort theorem names in order to deal with the theorems
+    # with the same name one after the other
+    theorem_names.sort()
+
     # trace only once the first theorem to save the updated tracing data
-    if with_tracing:
-        try:
-            Tracer(
-                Mwe(
-                    code,
-                    theorem_names[0],
-                ),
-                temp_dir,
-            ).trace_mwe()
-        except UnusualTheoremFormatError as err:
-            logger.debug(f"failed to get objects for theorem: {theorem_names[0]}")
-            logger.debug(err)
-            return 0, 0
+    try:
+        Tracer(
+            Mwe(
+                code,
+                theorem_names[0],
+            ),
+            tmp_dir,
+        ).trace_mwe()
+    except UnusualTheoremFormatError as err:
+        logger.debug(f"failed to get objects for theorem: {theorem_names[0]}")
+        logger.debug(err)
+        return 0, 0
 
     tactic_counter = 0
     success = 0
-    for theorem_name in theorem_names:
+    for k, theorem_name in enumerate(theorem_names):
         logger.debug(f"Testing with theorem: {theorem_name}")
         # if theorem_name != "image_coe_closedBall":
         #     continue
+        iteration = 0
+        while (
+            k - 1 - iteration >= 0 and theorem_name == theorem_names[k - 1 - iteration]
+        ):
+            iteration += 1
         try:
-            mwe, tactics = get_objects_for_theorem(theorem_name, code, tracing_res_path)
+            mwe, tactics = get_objects_for_theorem(
+                theorem_name, code, tracing_result_path, iteration
+            )
         except UnusualTheoremFormatError as err:
             logger.debug(f"failed to get objects for theorem: {theorem_name}")
             logger.debug(err)
@@ -76,7 +97,7 @@ def evaluate_all_tactics_of_file_in_gym(
         for tactic in finishing_tactics:
             tactic_counter += 1
             # Check tactics in gym
-            with Gym(mwe, None, temp_dir) as (gym, state_0):
+            with Gym(mwe, None, tmp_dir) as (gym, state_0):
                 cmds = [
                     pre_tactic.get_syntax_of_tactic(code_bytes)
                     for pre_tactic in tactics
@@ -100,81 +121,32 @@ def evaluate_all_tactics_of_file_in_gym(
                     logger.debug(f" expected previous state: {tactic.state_before}")
                     logger.debug(f" expected next state: {tactic.state_after}")
                     break
-        # if success < tactic_counter:
-        #     logger.info(f"out of {tactic_counter} theorems, {success} succeeded")
-        #     break
 
     logger.info(f"out of {tactic_counter} theorems, {success} succeeded")
     return success, tactic_counter
 
 
 if __name__ == "__main__":
+    # Config parameters
     NUM_CPUS = 2
-    ray.init(num_cpus=NUM_CPUS)
-    execution_envs = [f"execution_env_{i}" for i in range(NUM_CPUS)]
-    for folder in execution_envs:
-        os.makedirs(folder, exist_ok=True)
-    # Create a queue for folders
-    execution_envs_queue = deque(execution_envs)
+    path_to_mathlib4 = Path(sys.argv[1])
 
-    results = []
-    futures = {}
-    path_to_mathlib4 = Path("/Users/josojo/coding/ai/lean/mathlib4/Mathlib/")
-    all_files_in_path = []
-    for root, dirs, files in os.walk(path_to_mathlib4):
-        for file in files:
-            all_files_in_path.append(os.path.join(root, file))
-    for file in all_files_in_path:
-        file_path_new = file.replace("mathlib4", "mathlib4_new")
-        rewrite_all_proofs_in_tactic_style(file, file_path_new)
-        remove_comments_from_lean_file(file_path_new)
+    # Init parallel execution environment
+    executor = ParallelExecutor(NUM_CPUS)
 
-    files_to_investigate = []
-    path_to_mathlib4_new = Path("/Users/josojo/coding/ai/lean/mathlib4_new/Mathlib/")
-    for root, dirs, files in os.walk(path_to_mathlib4_new):
-        for file in files:
-            files_to_investigate.append(os.path.join(root, file))
+    # Get all files in mathlib
+    all_files_in_path = get_all_files_from_dictionary(path_to_mathlib4)
 
-    files_to_investigate = files_to_investigate[215:218]
-    #     "../tests/data/Mathlib.AlgebraicTopology.SimplexCategory_rewrite.lean",
-    #     "../tests/data/Mathlib.Analysis.Complex.UpperHalfPlane.Metric_rewrite.lean",
-    #     "../tests/data/Mathlib.Algebra.Algebra.Basic_rewrite.lean",
-    # ]
-    script_dir = os.path.dirname(os.path.realpath(__file__))
+    # Rewrite all proofs in tactic style and remove comments
+    path_to_mathlib4_new = Path(sys.argv[1] + "_rewritten")
+    prepare_lean_files_by_rewriting_and_removing_comments(
+        all_files_in_path, path_to_mathlib4, path_to_mathlib4_new
+    )
+    all_files_in_path = get_all_files_from_dictionary(path_to_mathlib4_new)
 
-    for file_path in files_to_investigate:
-        file_path = os.path.join(
-            script_dir,
-            file_path,
-        )
-        # Wait for an available folder
-        while not execution_envs_queue:
-            # Check for completed tasks
-            ready_ids, remaining_ids = ray.wait(
-                list(futures.keys()), num_returns=1, timeout=0
-            )
-
-            for done_id in ready_ids:
-                # Retrieve the result, free up the folder, and remove from tracking dict
-                result = ray.get(done_id)
-                results.append(result)
-                i, j = result
-                # if i < j:
-                #     raise ValueError("found unsuccessful tactic")
-                execution_envs_queue.append(futures.pop(done_id))
-
-        # Start a task with an available folder
-        env = execution_envs_queue.popleft()
-        tmp_dir = Path(os.path.normpath(os.path.join(script_dir, f"../../{env}/")))
-        tracing_result_path = os.path.join(tmp_dir, "build/ir/Main.ast.json")
-        logger.debug("Testing with file: " + file_path)
-        future = evaluate_all_tactics_of_file_in_gym.remote(
-            file_path, tracing_result_path, True, tmp_dir
-        )
-        futures[future] = env
-
-    # Wait for all remaining tasks to finish
-    results.extend(ray.get(list(futures.keys())))
+    # strip down the number of files to investigate for faster execution
+    all_files_in_path = all_files_in_path[270:275]
+    results = executor.run(evaluate_all_tactics_of_file_in_gym, all_files_in_path)
     SUCCESS_CNT = 0
     EXECUTION_CNT = 0
     for result in results:
