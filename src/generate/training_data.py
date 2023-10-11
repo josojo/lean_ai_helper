@@ -38,6 +38,10 @@ def generate_training_data(
     )
     tracing_result_path = Path(os.path.join(tmp_dir, "build/ir/Main.ast.json"))
     code = read_code_from_file(file_with_code_path)
+    project_dir = os.path.normpath(
+        os.path.join(os.path.dirname(os.path.realpath(__file__)), "/../../")
+    )
+    relative_file_with_code = os.path.relpath(project_dir, file_with_code_path)
 
     code_bytes = code.encode("utf-8")
     theorem_names = get_theorem_names_from_code(code)
@@ -59,13 +63,10 @@ def generate_training_data(
             tmp_dir,
         ).trace_mwe()
     except UnusualTheoremFormatError:
-        # logger.error(f"failed to get objects for theorem: {theorem_names[0]}")
-        # logger.error(err)
         return
     lock_path = Path(str(output_file) + ".lock")
 
     for k, theorem_name in enumerate(theorem_names):
-        # logger.debug(f"Testing with theorem: {theorem_name}")
         iteration = 0
         while (
             k - 1 - iteration >= 0 and theorem_name == theorem_names[k - 1 - iteration]
@@ -82,7 +83,7 @@ def generate_training_data(
         tracer.load_trace_result(tracing_result_path)
         json_data = {
             "theorem_name": theorem_name,
-            "file_path": str(file_with_code_path),
+            "file_path": str(relative_file_with_code),
             "tactics": [
                 {
                     "syntax": tactic.get_syntax_of_tactic(code_bytes),

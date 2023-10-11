@@ -59,7 +59,7 @@ def test_extracted_theorem_interaction_in_gym() -> None:
         json.loads(
             '{"theorem_name": "Finite.exists_finset", \
             "file_path": \
-                "/Users/josojo/coding/ai/fast_lean_dojo/tests/data/Mathlib.Data.Set.Finite.lean", \
+                "/tests/data/Mathlib.Data.Set.Finite.lean", \
             "tactics": [ \
                 {"syntax": "  cases h", "premises": []}, \
                 {"syntax": "  exact \u27e8s.toFinset, fun _ => mem_toFinset\u27e9",\

@@ -2,6 +2,7 @@
 # script to generate the file with the tactic style code
 
 import os
+import sys
 from ast import Tuple
 from pathlib import Path
 from typing import Optional
@@ -128,7 +129,7 @@ def evaluate_all_tactics_of_file_in_gym(
 if __name__ == "__main__":
     # Config parameters
     NUM_CPUS = 2
-    path_to_mathlib4 = Path("/Users/josojo/coding/ai/lean/mathlib4/Mathlib/")
+    path_to_mathlib4 = Path(sys.argv[1])
 
     # Init parallel execution environment
     executor = ParallelExecutor(NUM_CPUS)
@@ -137,7 +138,7 @@ if __name__ == "__main__":
     all_files_in_path = get_all_files_from_dictionary(path_to_mathlib4)
 
     # Rewrite all proofs in tactic style and remove comments
-    path_to_mathlib4_new = Path("/Users/josojo/coding/ai/lean/mathlib4_new/Mathlib/")
+    path_to_mathlib4_new = Path(sys.argv[1] + "_rewritten")
     prepare_lean_files_by_rewriting_and_removing_comments(
         all_files_in_path, path_to_mathlib4, path_to_mathlib4_new
     )
