@@ -1,7 +1,7 @@
 import os
 
 from pathlib import Path
-from scripts.helpers.helpers import get_objects_for_theorem
+from src.utils.reader import get_objects_for_theorem
 
 from src.logger_config import logger
 from src.interaction.utils import get_theorem_names_from_code
