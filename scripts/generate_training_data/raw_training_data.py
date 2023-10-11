@@ -15,8 +15,9 @@ from src.lean_env.setup import ParallelExecutor
 if __name__ == "__main__":
 
     # Config parameters
-    NUM_CPUS = 2
     path_to_mathlib4 = Path(sys.argv[1])
+    path_to_mathlib4_new = Path(sys.argv[1] + "_rewritten")
+    NUM_CPUS = 2
 
     # Init parallel execution environment
     executor = ParallelExecutor(NUM_CPUS)
@@ -25,7 +26,6 @@ if __name__ == "__main__":
     all_files_in_path = get_all_files_from_dictionary(path_to_mathlib4)
 
     # Rewrite all proofs in tactic style and remove comments
-    path_to_mathlib4_new = Path(sys.argv[1] + "_rewritten")
     prepare_lean_files_by_rewriting_and_removing_comments(
         all_files_in_path, path_to_mathlib4, path_to_mathlib4_new
     )
