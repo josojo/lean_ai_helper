@@ -10,13 +10,14 @@ from src.generate.training_data import (
     close_array_in_output_file,
 )
 from src.lean_env.setup import ParallelExecutor
+from src.utils.utils import remove_last_slash
 
 
 if __name__ == "__main__":
 
     # Config parameters
     path_to_mathlib4 = Path(sys.argv[1])
-    path_to_mathlib4_new = Path(sys.argv[1] + "_rewritten")
+    path_to_mathlib4_new = Path(remove_last_slash(sys.argv[1]) + "_rewritten")
     NUM_CPUS = 2
 
     # Init parallel execution environment
