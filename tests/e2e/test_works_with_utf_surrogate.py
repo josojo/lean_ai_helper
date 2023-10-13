@@ -20,11 +20,9 @@ def test_extracted_theorem_interaction_in_gym() -> None:
     )
     mwe.rewrite_to_tactic_style()
 
-    tracer = Tracer(mwe)
-    tracer.trace_mwe()
-    # Get tactics
-    tactics = tracer.get_traced_tactic(tracer.tracing_result.tatics)
-
+    tracer_of_mwe = Tracer(mwe)
+    tracer_of_mwe.trace_mwe()
+    tactics = tracer_of_mwe.get_traced_tactic(tracer_of_mwe.tracing_result.tatics)
     code = mwe.code.encode("utf-8")
 
     tatic_codes = list(
@@ -33,9 +31,10 @@ def test_extracted_theorem_interaction_in_gym() -> None:
     logger.debug(f"tactics: {tatic_codes}")
 
     # Check tactics in gym
-    with Gym(mwe) as (gym, state_0):
+    with Gym(mwe) as (gym, state):
+        # run in gym
         state_1 = gym.run_tacs(
-            state_0,
+            state,
             [tactic.get_syntax_of_tactic(code) for tactic in tactics],
         )
         assert isinstance(state_1, ProofFinished)
