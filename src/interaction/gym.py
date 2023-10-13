@@ -165,7 +165,7 @@ class Gym:
         return self._submit_tactics(tsid, tactics)
 
     def _submit_tactics(self, tsid: int, tactics: List[str]) -> TacticResult:
-        req = json.dumps({"sid": tsid, "cmd": tactics})
+        req = json.dumps({"sid": tsid, "cmd": tactics}, ensure_ascii=False)
         res = self._submit_request(req)
 
         if res["error"] is not None:
