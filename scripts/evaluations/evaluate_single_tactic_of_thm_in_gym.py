@@ -21,6 +21,7 @@ from src.interaction.utils import get_theorem_names_from_code
 from src.mwe import Mwe, UnusualTheoremFormatError
 from src.trace.trace import Tracer
 from src.interaction.gym import Gym, ProofFinished
+from src.utils.utils import remove_last_slash
 
 from tests.utils.utils import read_code_from_file
 
@@ -138,7 +139,7 @@ if __name__ == "__main__":
     all_files_in_path = get_all_files_from_dictionary(path_to_mathlib4)
 
     # Rewrite all proofs in tactic style and remove comments
-    path_to_mathlib4_new = Path(sys.argv[1] + "_rewritten")
+    path_to_mathlib4_new = Path(remove_last_slash(sys.argv[1]) + "_rewritten")
     prepare_lean_files_by_rewriting_and_removing_comments(
         all_files_in_path, path_to_mathlib4, path_to_mathlib4_new
     )
