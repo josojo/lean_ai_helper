@@ -21,13 +21,13 @@ from src.interaction.utils import get_theorem_names_from_code
 from src.mwe import Mwe, UnusualTheoremFormatError
 from src.trace.trace import Tracer
 from src.interaction.gym import Gym, ProofFinished
-from src.utils.utils import remove_last_slash
+from src.utils.utils import get_folder_and_path_from_path
 
 from tests.utils.utils import read_code_from_file
 
 
 @ray.remote
-def evaluate_all_tactics_of_file_in_gym(
+def evaluate_final_tactics_of_file_in_gym(
     file_with_code_path: Path,
     environment: Path,
     _output_file: Optional[Path] = None,
@@ -129,7 +129,7 @@ def evaluate_all_tactics_of_file_in_gym(
 
 if __name__ == "__main__":
     # Config parameters
-    NUM_CPUS = 2
+    NUM_CPUS = 4
     path_to_mathlib4 = Path(sys.argv[1])
 
     # Init parallel execution environment
@@ -139,15 +139,17 @@ if __name__ == "__main__":
     all_files_in_path = get_all_files_from_dictionary(path_to_mathlib4)
 
     # Rewrite all proofs in tactic style and remove comments
-    path_to_mathlib4_new = Path(remove_last_slash(sys.argv[1]) + "_rewritten")
+    path, foldername = get_folder_and_path_from_path(path_to_mathlib4)
+
+    path_to_mathlib4_new = os.path.join(path, str(foldername) + "_rewritten")
     prepare_lean_files_by_rewriting_and_removing_comments(
         all_files_in_path, path_to_mathlib4, path_to_mathlib4_new
     )
     all_files_in_path = get_all_files_from_dictionary(path_to_mathlib4_new)
 
     # strip down the number of files to investigate for faster execution
-    all_files_in_path = all_files_in_path[270:275]
-    results = executor.run(evaluate_all_tactics_of_file_in_gym, all_files_in_path)
+    all_files_in_path = all_files_in_path[210:]
+    results = executor.run(evaluate_final_tactics_of_file_in_gym, all_files_in_path)
     SUCCESS_CNT = 0
     EXECUTION_CNT = 0
     for result in results:
