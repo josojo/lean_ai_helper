@@ -38,7 +38,7 @@ class ParallelExecutor:
                     try:
                         result = ray.get(done_id)
                         results.append(result)
-                    except Exception as e: #pylint: disable=broad-except
+                    except Exception as e:  # pylint: disable=broad-except
                         logger.error(
                             f"Exception: {e} for running the function with the file: {argument}"
                         )
