@@ -12,7 +12,7 @@ python -m venv venv
 source venv/bin/activate
 ```
 
-Install lean and lake as suggested [here:](https://lean-lang.org/lean4/doc/quickstart.html)
+Install lean and lake as suggested [here](https://lean-lang.org/lean4/doc/quickstart.html)
 
 ## Runnig tests
 
@@ -21,7 +21,7 @@ make test-unit
 make test-e2e
 ```
 
-## Create an data export of mathlib4
+## Create training data from mathlib4
 
 Modify the function `generate_training_data` in src/generate/training_data according to your needs.
 
