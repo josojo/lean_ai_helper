@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 from typing import Any, Dict, List, Protocol
 import ray
+from loguru import logger
 
 
 class RayRemoteProtocol(Protocol):
@@ -23,7 +24,10 @@ class ParallelExecutor:
     def run(self, exec_function: RayRemoteProtocol, args: List[Any]) -> List[Any]:
         results = []
         futures: Dict[Any, Path] = {}
-        for argument in args:
+        length_of_files = len(args)
+        for cnt, argument in enumerate(args):
+            logger.info(f"Running the function with the file: {argument}")
+            logger.info(f"Progress: {cnt}/{length_of_files}")
             # Wait for an available folder
             while not self.execution_envs_queue:
                 # Check for completed tasks
@@ -31,8 +35,13 @@ class ParallelExecutor:
 
                 for done_id in ready_ids:
                     # Retrieve the result, free up the folder, and remove from tracking dict
-                    result = ray.get(done_id)
-                    results.append(result)
+                    try:
+                        result = ray.get(done_id)
+                        results.append(result)
+                    except Exception as e:  # pylint: disable=broad-except
+                        logger.error(
+                            f"Exception: {e} for running the function with the file: {argument}"
+                        )
                     self.execution_envs_queue.append(futures.pop(done_id))
 
             # Start a task with an available folder
