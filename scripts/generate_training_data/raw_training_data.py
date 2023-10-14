@@ -10,14 +10,15 @@ from src.generate.training_data import (
     close_array_in_output_file,
 )
 from src.lean_env.setup import ParallelExecutor
-from src.utils.utils import remove_last_slash
+from src.utils.utils import get_folder_and_path_from_path
 
 
 if __name__ == "__main__":
 
     # Config parameters
     path_to_mathlib4 = Path(sys.argv[1])
-    path_to_mathlib4_new = Path(remove_last_slash(sys.argv[1]) + "_rewritten")
+    path, foldername = get_folder_and_path_from_path(path_to_mathlib4)
+    path_to_mathlib4_new = os.path.join(path, str(foldername) + "_rewritten")
     NUM_CPUS = 2
 
     # Init parallel execution environment
