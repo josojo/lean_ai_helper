@@ -8,7 +8,7 @@ from tests.utils.utils import read_code_from_file
 
 
 def test_extracted_theorem_interaction_in_gym() -> None:
-    code = read_code_from_file("./tests/data/crashing.lean")
+    code = read_code_from_file("./tests/data/gym_crashing.lean")
     # produces the following crash error:
     # Main.lean:572:2: error: unknown constant 'Mathlib.Tactic.Ring.zero_pow.match_1'
     mwe = Mwe(
