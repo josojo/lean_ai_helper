@@ -200,12 +200,19 @@ class Gym:
     def _modify_proof(self) -> str:
         # Modify the proof and set up the `repl` tactic.
         code_proof = "\n  by\n  lean_dojo_repl\n  sorry\n"
-        code_before_theorem = self.mwe.code[: self.mwe.theorem_start]
+        parts = re.split(r"\bimport\b", self.mwe.code, maxsplit=1)
+        code_before_imports = ""
+        if len(parts) == 2:
+            code_before_imports = str(parts[0])
+        code_before_theorem = self.mwe.code[
+            len(code_before_imports) : self.mwe.theorem_start
+        ]
         code_thereom = ""
         if self.tactic is None:
             code_thereom = self.mwe.code[self.mwe.theorem_start : self.mwe.proof_start]
             modified_code = (
-                "import Lean4Repl\n\n"
+                code_before_imports
+                + "import Lean4Repl\n\n"
                 + code_before_theorem
                 + code_thereom
                 + code_proof
@@ -219,7 +226,8 @@ class Gym:
                 + "lean_dojo_repl\n sorry\n"
             )
             modified_code = (
-                "import Lean4Repl\n\n"
+                code_before_imports
+                + "import Lean4Repl\n\n"
                 + code_before_theorem
                 + code_thereom
                 + self.mwe.code[self.mwe.proof_end :]
