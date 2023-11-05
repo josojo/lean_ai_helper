@@ -123,7 +123,7 @@ class Mwe:
         self.code = code[: self.proof_start] + rw_code + code[self.proof_end :]
 
 
-def rewrite_code_with_expanded_rw(input_string):
+def rewrite_code_with_expanded_rw(input_string: str) -> str:
     # Define the regular expression pattern to match the content inside the square brackets
     pattern = r"rw\s*\[([^]]*)\]"
 
