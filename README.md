@@ -12,6 +12,12 @@ python -m venv venv
 source venv/bin/activate
 ```
 
+to run all scripts and tests without explict imports, export the path src like this:
+
+```sh
+export PYTHONPATH="${PYTHONPATH}:$(pwd)/src"
+```
+
 Install lean and lake as suggested [here](https://lean-lang.org/lean4/doc/quickstart.html)
 
 ## Runnig tests
