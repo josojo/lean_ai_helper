@@ -1,6 +1,6 @@
 import os
 
-from src.utils.lean_code_modifier import rewrite_all_proofs_in_tactic_style
+from src.utils.lean_code_modifier import rewrite_all_proofs
 
 
 if __name__ == "__main__":
@@ -13,4 +13,4 @@ if __name__ == "__main__":
         script_dir,
         "../../tests/data/anomalie.2_rewrite.lean",
     )
-    rewrite_all_proofs_in_tactic_style(file_path, file_path_new)
+    rewrite_all_proofs(file_path, file_path_new)

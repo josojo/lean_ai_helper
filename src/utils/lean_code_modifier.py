@@ -24,7 +24,7 @@ def remove_comments_from_lean_file(filename: Path) -> None:
                 is_comment = False
 
 
-def rewrite_all_proofs_in_tactic_style(
+def rewrite_all_proofs(
     file_with_code_path: Path, file_for_writing_result: Path
 ) -> None:
     logger.debug(f"Testing with file: {file_with_code_path}")
@@ -40,6 +40,7 @@ def rewrite_all_proofs_in_tactic_style(
                 theorem_name,
             )
             mwe.rewrite_to_tactic_style()
+            mwe.rewrite_expand_rw()
             code = mwe.code
         except UnusualTheoremFormatError as err:
             logger.debug(f"failed to get objects for theorem: {theorem_name}")
