@@ -27,3 +27,19 @@ def initiate_mwe_for_finite_def() -> Mwe:
         "finite_def",
     )
     return mwe
+
+def initiate_mwe_for_rw() -> Mwe:
+    code = read_code_from_file("./tests/data/rw.lean")
+    mwe = Mwe(
+        code,
+        "oangle_add_right_eq_arccos_of_oangle_eq_pi_div_two",
+    )
+    return mwe
+
+def initiate_mwe_for_rw_2() -> Mwe:
+    code = read_code_from_file("./tests/data/rw.lean")
+    mwe = Mwe(
+        code,
+        "oangle_add_right_eq_arcsin_of_oangle_eq_pi_div_two",
+    )
+    return mwe

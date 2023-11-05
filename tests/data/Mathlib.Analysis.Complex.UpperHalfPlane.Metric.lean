@@ -68,7 +68,8 @@ theorem tanh_half_dist (z w : ℍ) :
 
 theorem exp_half_dist (z w : ℍ) :
     exp (dist z w / 2) = (dist (z : ℂ) w + dist (z : ℂ) (conj ↑w)) / (2 * sqrt (z.im * w.im)) := by
-  rw [← sinh_add_cosh, sinh_half_dist, cosh_half_dist, add_div]
+  rw [← sinh_add_cosh]
+  rw [sinh_half_dist]cosh_half_dist, add_div]
 #align upper_half_plane.exp_half_dist UpperHalfPlane.exp_half_dist
 
 theorem cosh_dist (z w : ℍ) : cosh (dist z w) = 1 + dist (z : ℂ) w ^ 2 / (2 * z.im * w.im) := by

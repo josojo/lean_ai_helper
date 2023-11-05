@@ -11,7 +11,7 @@ import ray
 
 from src.utils.reader import get_objects_for_theorem
 from src.utils.lean_code_modifier import (
-    rewrite_all_proofs_in_tactic_style,
+    rewrite_all_proofs,
 )
 from src.utils.lean_code_modifier import remove_comments_from_lean_file
 
@@ -128,5 +128,5 @@ def prepare_lean_files_by_rewriting_and_removing_comments(
     for file in all_lean_files:
         relative_path = os.path.relpath(file, input_dir)
         file_path_new = Path(os.path.join(output_dir, relative_path))
-        rewrite_all_proofs_in_tactic_style(file, file_path_new)
+        rewrite_all_proofs(file, file_path_new)
         remove_comments_from_lean_file(file_path_new)
