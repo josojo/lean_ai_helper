@@ -28,6 +28,7 @@ def initiate_mwe_for_finite_def() -> Mwe:
     )
     return mwe
 
+
 def initiate_mwe_for_rw() -> Mwe:
     code = read_code_from_file("./tests/data/rw.lean")
     mwe = Mwe(
@@ -35,6 +36,7 @@ def initiate_mwe_for_rw() -> Mwe:
         "oangle_add_right_eq_arccos_of_oangle_eq_pi_div_two",
     )
     return mwe
+
 
 def initiate_mwe_for_rw_2() -> Mwe:
     code = read_code_from_file("./tests/data/rw.lean")

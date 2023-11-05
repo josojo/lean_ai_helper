@@ -108,9 +108,9 @@ class Mwe:
         )
         self.proof_end += len(" by exact ()")
         self.code = tactic_style_code
-    
+
     def rewrite_expand_rw(self) -> None:
-        """ expands all rw commands in the proof of the theorem. """
+        """expands all rw commands in the proof of the theorem."""
         code = self.code
 
         rw_code = code[self.proof_start : self.proof_end]
@@ -120,17 +120,13 @@ class Mwe:
         final_length = len(rw_code)
         print(final_length)
         self.proof_end += final_length - initial_length
-        self.code = (
-            code[: self.proof_start] 
-            + rw_code
-            + code[self.proof_end :])
-        
+        self.code = code[: self.proof_start] + rw_code + code[self.proof_end :]
 
 
 def rewrite_code_with_expanded_rw(input_string):
     # Define the regular expression pattern to match the content inside the square brackets
-    pattern = r'rw\s*\[([^]]*)\]'
-    
+    pattern = r"rw\s*\[([^]]*)\]"
+
     # Use findall to extract the content within the brackets
     matches = re.findall(pattern, input_string)
 
@@ -140,11 +136,10 @@ def rewrite_code_with_expanded_rw(input_string):
     # If matches were found, process them
     for match in matches:
         # Split the matches by comma and strip any surrounding whitespace
-        elements = [elem.strip() for elem in match.split(',')]
-        
+        elements = [elem.strip() for elem in match.split(",")]
+
         # Format the new string
-        reformatted_string = '; '.join(f'rw [{elem}]' for elem in elements)
-        input_string = input_string.replace(f'rw [{match}]', reformatted_string)
+        reformatted_string = "; ".join(f"rw [{elem}]" for elem in elements)
+        input_string = input_string.replace(f"rw [{match}]", reformatted_string)
     print(input_string)
     return input_string
- 
